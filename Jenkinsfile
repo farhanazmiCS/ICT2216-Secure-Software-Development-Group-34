@@ -23,9 +23,10 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('backend') {
-                    sh 'pip3 install -r requirements.txt'
-                    sh 'python3 manage.py migrate'
-                    sh 'python3 manage.py collectstatic --noinput'
+                    sh 'python3 -m venv venv'
+                    sh './venv/bin/pip install -r requirements.txt'
+                    sh './venv/bin/python manage.py migrate'
+                    sh './venv/bin/python manage.py collectstatic --noinput'
                 }
             }
         }
