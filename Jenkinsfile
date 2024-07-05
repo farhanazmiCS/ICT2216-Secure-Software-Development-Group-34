@@ -16,7 +16,7 @@ pipeline {
             steps {
                 dir('frontend') {
                     sh 'npm install'
-                    // Remove 'npm run build' as we will run the development server
+                    sh 'npm run build'
                 }
             }
         }
@@ -24,10 +24,7 @@ pipeline {
         stage('Deploy Frontend') {
             steps {
                 dir('frontend') {
-                    // Create log file directory if it doesn't exist
-                    sh 'mkdir -p /var/lib/jenkins/workspace/asms/frontend/logs'
-                    // Start the React development server in the background and log output
-                    sh 'nohup npm start > /var/lib/jenkins/workspace/asms/frontend/logs/frontend.log 2>&1 &'
+                    sh 'sudo cp -r build/* /var/www/html/'
                 }
             }
         }
