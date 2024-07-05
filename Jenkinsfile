@@ -25,7 +25,7 @@ pipeline {
             steps {
                 dir('frontend') {
                     // Start the React development server in the background
-                    sh 'npm start'
+                    sh 'nohup npm start'
                 }
             }
         }
