@@ -14,7 +14,7 @@ pipeline {
         }
         stage('Build Frontend') {
             steps {
-                dir('frontend') {
+                dir('client') {
                     sh 'npm install'
                     sh 'npm run build'
                 }
@@ -22,26 +22,15 @@ pipeline {
         }
         stage('Build Backend') {
             steps {
-                dir('backend') {
-                    sh 'python3 -m venv venv'
-                    sh './venv/bin/pip install -r requirements.txt'
-                    sh './venv/bin/python manage.py migrate'
-                    sh './venv/bin/python manage.py collectstatic --noinput'
+                dir('') {
+                    sh 'npm install'
                 }
             }
         }
-        stage('Deploy Frontend') {
+        stage('Deploy') {
             steps {
-                dir('frontend') {
-                    sh 'cp -r build/* /var/www/html/'
-                }
-            }
-        }
-        stage('Deploy Backend') {
-            steps {
-                dir('backend') {
-                    sh 'cp -r * /var/www/django_app/'
-                    sh 'gunicorn --workers 3 your_django_project.wsgi:application --bind unix:/var/www/django_app/gunicorn.sock'
+                dir('') {
+                    sh 'npm start'
                 }
             }
         }
