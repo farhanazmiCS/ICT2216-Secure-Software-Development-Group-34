@@ -25,18 +25,10 @@ pipeline {
             steps {
                 dir('frontend') {
                     // Start the React development server in the background
-                    sh 'nohup npm start &'
+                    sh 'npm start'
                 }
             }
         }
         
-    }
-    post {
-        always {
-            // Print the frontend log to the Jenkins console output
-            dir('frontend') {
-                sh 'cat frontend.log'
-            }
-        }
     }
 }
