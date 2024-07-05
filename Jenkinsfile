@@ -1,10 +1,10 @@
 pipeline {
     agent any
     tools {
-        nodejs 'NodeJS'
+        nodejs 'NodeJS' // Ensure NodeJS tool is configured in Jenkins
     }
     environment {
-        GITHUB_CREDENTIALS = credentials('access-token')
+        GITHUB_CREDENTIALS = credentials('access-token') // Replace with your actual credentials ID
     }
     stages {
         stage('Checkout') {
@@ -20,19 +20,14 @@ pipeline {
                 }
             }
         }
-        stage('Build Backend') {
+        
+        stage('Deploy Frontend') {
             steps {
-                dir('') {
-                    sh 'npm install'
+                dir('frontend') {
+                    sh 'sudo cp -r build/* /var/www/html/'
                 }
             }
         }
-        stage('Deploy') {
-            steps {
-                dir('') {
-                    sh 'npm start'
-                }
-            }
-        }
+        
     }
 }
