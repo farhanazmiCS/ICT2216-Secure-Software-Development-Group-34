@@ -8,6 +8,7 @@
     "client": "npm start --prefix client",
     "client:build": "npm run build --prefix client",
     "dev": "npm run client:build && npm run start"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "concurrently": "^8.2.2",
     "nodemon": "^2.0.9"
+    "supertest": "^6.3.4"
   },
   "engines": {
     "node": "14.x"
