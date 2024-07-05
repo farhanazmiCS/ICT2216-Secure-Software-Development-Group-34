@@ -14,7 +14,7 @@ const xss = require('xss-clean');
 const cors = require('cors');
 const mongoSanitize = require('express-mongo-sanitize');
 const path = require('path');
-
+const session = require ('express-session')
 // database
 const connectDB = require('./db/connect');
 
@@ -46,6 +46,16 @@ app.use(mongoSanitize());
 
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
+
+app.use(session({ 
+  secret:'secret',
+  resave:false,
+  saveUninitialized:false,
+  cookie: {
+    secure:true,
+    maxAge: 1000*60*60*24
+  }
+}))
 
 // app.use(express.static('./client/build'));
 app.use(fileUpload());

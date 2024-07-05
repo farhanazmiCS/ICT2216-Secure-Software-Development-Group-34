@@ -102,6 +102,17 @@ const AppProvider = ({ children }) => {
     }, 3000);
   };
 
+
+  // const addUserToLocalStorage = ({ user, session }) => {
+  //   localStorage.setItem('user', JSON.stringify(user));
+  //   localStorage.setItem('session', session);
+  // };
+  
+  // const removeUserFromLocalStorage = () => {
+  //   localStorage.removeItem('user');
+  //   localStorage.removeItem('session');
+  // };
+
   const setupUser = async ({ currentUser, endPoint, alertText }) => {
     dispatch({ type: SETUP_USER_BEGIN });
     try {
@@ -111,10 +122,12 @@ const AppProvider = ({ children }) => {
       );
 
       const { user, location } = data;
+      //const { session } = data;
       dispatch({
         type: SETUP_USER_SUCCESS,
         payload: { user, location, alertText },
       });
+      //addUserToLocalStorage({ session });
     } catch (error) {
       dispatch({
         type: SETUP_USER_ERROR,
@@ -141,6 +154,7 @@ const AppProvider = ({ children }) => {
         type: UPDATE_USER_SUCCESS,
         payload: { user, location },
       });
+      //removeUserFromLocalStorage({ session });
     } catch (error) {
       if (error.response.status !== 401) {
         dispatch({
