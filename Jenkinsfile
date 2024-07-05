@@ -24,8 +24,10 @@ pipeline {
         stage('Deploy Frontend') {
             steps {
                 dir('frontend') {
-                    // Start the React development server in the background
-                    sh 'nohup npm start'
+                    // Create log file directory if it doesn't exist
+                    sh 'mkdir -p /var/lib/jenkins/workspace/asms/frontend/logs'
+                    // Start the React development server in the background and log output
+                    sh 'nohup npm start > /var/lib/jenkins/workspace/asms/frontend/logs/frontend.log 2>&1 &'
                 }
             }
         }
