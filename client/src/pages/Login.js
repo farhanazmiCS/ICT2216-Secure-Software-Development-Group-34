@@ -48,9 +48,10 @@ const Login = () => {
 
   useEffect(() => {
     if (user) {
-      setTimeout(() => {
-        navigate('/');
-      }, 3000);
+      navigate('/');
+      // setTimeout(() => {
+      //   navigate('/');
+      // }, 3000);
     }
   }, [user, navigate]);
   return (
@@ -88,7 +89,7 @@ const Login = () => {
           <button type='submit' className='btn btn-block' disabled={isLoading}>
             submit
           </button>
-          <button
+          {/* <button
             type='button'
             className='btn btn-block btn-hipster'
             disabled={isLoading}
@@ -101,7 +102,8 @@ const Login = () => {
             }}
           >
             {isLoading ? 'loading...' : 'demo app'}
-          </button>
+          </button> */}
+          {isLoading && "loading..."}
           <p>
             {values.isMember ? 'Not a member yet?' : 'Already a member?'}
             <button type='button' onClick={toggleMember} className='member-btn'>
