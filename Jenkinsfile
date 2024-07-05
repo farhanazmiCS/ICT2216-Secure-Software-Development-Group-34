@@ -1,10 +1,10 @@
 pipeline {
     agent any
     tools {
-        nodejs 'NodeJS'
+        nodejs 'NodeJS' // Ensure NodeJS tool is configured in Jenkins
     }
     environment {
-        GITHUB_CREDENTIALS = credentials('access-token')
+        GITHUB_CREDENTIALS = credentials('access-token') // Replace with your actual credentials ID
     }
     stages {
         stage('Checkout') {
@@ -16,7 +16,7 @@ pipeline {
             steps {
                 dir('frontend') {
                     sh 'npm install'
-                    sh 'npm run build'
+                    // Remove 'npm run build' as we will run the development server
                 }
             }
         }
@@ -33,7 +33,8 @@ pipeline {
         stage('Deploy Frontend') {
             steps {
                 dir('frontend') {
-                    sh 'cp -r build/* /var/www/html/'
+                    // Start the React development server in the background
+                    sh 'nohup npm start &'
                 }
             }
         }
