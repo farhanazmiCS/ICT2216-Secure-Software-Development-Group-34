@@ -31,4 +31,12 @@ pipeline {
         }
         
     }
+    post {
+        always {
+            // Print the frontend log to the Jenkins console output
+            dir('frontend') {
+                sh 'cat frontend.log'
+            }
+        }
+    }
 }
