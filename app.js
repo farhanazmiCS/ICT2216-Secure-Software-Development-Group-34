@@ -63,7 +63,7 @@ app.use(session({
   saveUninitialized:false,
   cookie: {
     secure:true,
-    maxAge: 1000*60*60*24
+    maxAge: 1000*60*60
   }
 }))
 // app.use(express.static('./client/build'));
