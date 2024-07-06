@@ -101,16 +101,7 @@ const AppProvider = ({ children }) => {
       dispatch({ type: CLEAR_ALERT });
     }, 3000);
   };
-  // const addUserToLocalStorage = ({ user, session }) => {
-  //   localStorage.setItem('user', JSON.stringify(user));
-  //   localStorage.setItem('session', session);
-  // };
 
-  // const removeUserFromLocalStorage = () => {
-  //   localStorage.removeItem('user');
-  //   localStorage.removeItem('session');
-  // };
-  
   const setupUser = async ({ currentUser, endPoint, alertText }) => {
     dispatch({ type: SETUP_USER_BEGIN });
     try {
@@ -118,13 +109,12 @@ const AppProvider = ({ children }) => {
         `/api/v1/auth/${endPoint}`,
         currentUser
       );
-      //const { session } = data;
+
       const { user, location } = data;
       dispatch({
         type: SETUP_USER_SUCCESS,
         payload: { user, location, alertText },
       });
-      //addUserToLocalStorage({ session });
     } catch (error) {
       dispatch({
         type: SETUP_USER_ERROR,
@@ -140,7 +130,6 @@ const AppProvider = ({ children }) => {
   const logoutUser = async () => {
     await authFetch.get('/auth/logout');
     dispatch({ type: LOGOUT_USER });
-    //removeUserFromLocalStorage({ session });
   };
   const updateUser = async (currentUser) => {
     dispatch({ type: UPDATE_USER_BEGIN });
