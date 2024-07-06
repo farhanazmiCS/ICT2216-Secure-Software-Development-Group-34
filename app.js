@@ -6,6 +6,7 @@ const express = require('express');
 const app = express();
 // rest of the packages
 const morgan = require('morgan');
+const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const rateLimiter = require('express-rate-limit');
@@ -46,6 +47,15 @@ app.use(mongoSanitize());
 
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
+
+// CSRF protection
+app.use(csrf({ cookie: true }));
+
+// Middleware to set CSRF token in a cookie
+app.use((req, res, next) => {
+  res.cookie('XSRF-TOKEN', req.csrfToken());
+  next();
+});
 
 // app.use(express.static('./client/build'));
 app.use(fileUpload());
