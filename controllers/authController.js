@@ -2,7 +2,7 @@ const User = require('../models/User');
 const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
 const { attachCookiesToResponse, createTokenUser } = require('../utils');
-
+const session = require ('express-session')
 const register = async (req, res) => {
   const { email, name, password } = req.body;
 
@@ -37,8 +37,11 @@ const login = async (req, res) => {
   }
   const tokenUser = createTokenUser(user);
   attachCookiesToResponse({ res, user: tokenUser });
+  req.session.name = user._id;
+  //console.log(req.session.name);
+  res.status(StatusCodes.OK).json({ Login:true, user: tokenUser, session: req.session.name });
 
-  res.status(StatusCodes.OK).json({ user: tokenUser });
+  //res.json({Login:true,user:req.session.name})
 };
 const logout = async (req, res) => {
   res.cookie('token', 'logout', {
