@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navbar, Sidebar, Footer } from './components';
+
 import {
   Home,
   SinglePet,
@@ -12,6 +13,7 @@ import {
   PrivateRoute,
   AuthWrapper,
   Login,
+  Logout,
 } from './pages';
 function App() {
   return (
@@ -28,6 +30,7 @@ function App() {
           <Route path='pets' element={<Pets />} />
           <Route path='pets/:id' element={<SinglePet />} />
           <Route path='login' element={<Login />} />
+          <Route path='logout' element={<Logout/>} />  
           <Route
             path='checkout'
             element={
@@ -54,7 +57,7 @@ function App() {
           
           {/* Error Route */}
           <Route path='*' element={<Error />} />
-
+            
         </Routes>
         <Footer />
       </Router>

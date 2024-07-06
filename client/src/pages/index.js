@@ -8,6 +8,7 @@ import Checkout from './CheckoutPage'
 import PrivateRoute from './PrivateRoute'
 import AuthWrapper from './AuthWrapper'
 import Login from './Login'
+import Logout from './Logout'
 export {
   Home,
   SinglePet,
@@ -18,5 +19,6 @@ export {
   Pets,
   PrivateRoute,
   AuthWrapper,
-  Login
+  Login,
+  Logout
 }

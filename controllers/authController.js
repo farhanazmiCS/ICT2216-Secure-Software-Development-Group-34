@@ -47,7 +47,13 @@ const logout = async (req, res) => {
     httpOnly: true,
     expires: new Date(Date.now() + 1000),
   });
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: 'Could not log out user.' });
+    }
+    res.clearCookie('connect.sid'); // Clear the session cookie
   res.status(StatusCodes.OK).json({ msg: 'user logged out!' });
+});
 };
 
 module.exports = {
