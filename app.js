@@ -14,7 +14,7 @@ const xss = require('xss-clean');
 const cors = require('cors');
 const mongoSanitize = require('express-mongo-sanitize');
 const path = require('path');
-
+const csrf = require('csurf');
 // database
 const connectDB = require('./db/connect');
 
@@ -46,6 +46,15 @@ app.use(mongoSanitize());
 
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
+
+// CSRF protection
+app.use(csrf({ cookie: true }));
+
+// Middleware to set CSRF token in a cookie
+app.use((req, res, next) => {
+  res.cookie('XSRF-TOKEN', req.csrfToken());
+  next();
+});
 
 // app.use(express.static('./client/build'));
 app.use(fileUpload());

@@ -33,6 +33,11 @@ import {
   GET_CURRENT_USER_BEGIN,
   GET_CURRENT_USER_SUCCESS,
 } from '../actions';
+import Cookies from 'js-cookie';
+
+const getCSRFToken = () => {
+  return Cookies.get('XSRF-TOKEN');
+};
 
 const initialState = {
   userLoading: true,
@@ -75,6 +80,15 @@ const AppProvider = ({ children }) => {
     baseURL: '/api/v1',
   });
   // request
+  authFetch.interceptors.request.use(
+    (config) => {
+      config.headers['X-CSRF-Token'] = getCSRFToken();
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
 
   // response
 
@@ -107,9 +121,14 @@ const AppProvider = ({ children }) => {
     try {
       const { data } = await axios.post(
         `/api/v1/auth/${endPoint}`,
-        currentUser
+        currentUser,
+        {
+          headers: {
+            'X-CSRF-Token': getCSRFToken(),
+          },
+        }
       );
-
+      
       const { user, location } = data;
       dispatch({
         type: SETUP_USER_SUCCESS,
