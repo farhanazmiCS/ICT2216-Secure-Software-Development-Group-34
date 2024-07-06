@@ -15,6 +15,7 @@ const cors = require('cors');
 const mongoSanitize = require('express-mongo-sanitize');
 const path = require('path');
 const csrf = require('csurf');
+const session = require ('express-session')
 // database
 const connectDB = require('./db/connect');
 
@@ -56,6 +57,15 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(session({ 
+  secret:'secret',
+  resave:false,
+  saveUninitialized:false,
+  cookie: {
+    secure:true,
+    maxAge: 1000*60*60*24
+  }
+}))
 // app.use(express.static('./client/build'));
 app.use(fileUpload());
 
