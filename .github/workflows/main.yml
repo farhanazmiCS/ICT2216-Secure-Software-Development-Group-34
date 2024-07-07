@@ -1,0 +1,50 @@
+name: Deploy Frontend and Backend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18' # Use the version you prefer
+
+    - name: Install dependencies and build frontend
+      working-directory: ./client
+      run: |
+        npm install
+        npm run build
+
+    - name: Install dependencies and build backend
+      run: |
+        npm install
+        npm run build
+
+    - name: Copy SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+    - name: Add SSH key to the agent
+      run: |
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/id_rsa
+
+    - name: Deploy frontend
+      run: |
+        scp -o StrictHostKeyChecking=no -r client/build/* ${{ secrets.USER }}@${{ secrets.HOST }}:/var/www/html/
+
+    - name: Deploy backend
+      run: |
+        scp -o StrictHostKeyChecking=no -r * ${{ secrets.USER }}@${{ secrets.HOST }}:/path/to/backend/
+        ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} 'cd /path/to/backend && npm install && pm2 restart all'
