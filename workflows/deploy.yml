@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy Frontend and Backend
 
 on:
   push:
@@ -6,42 +6,45 @@ on:
       - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install SSH key
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_KEY }}
-
-    - name: Install Node.js
+    - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'
+        node-version: '18' # Use the version you prefer
 
-    - name: Build frontend
+    - name: Install dependencies and build frontend
+      working-directory: ./client
       run: |
-        cd client
         npm install
         npm run build
+
+    - name: Install dependencies and build backend
+      run: |
+        npm install
+        npm run build
+
+    - name: Copy SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+    - name: Add SSH key to the agent
+      run: |
+        eval "$(ssh-agent -s)"
+        ssh-add ~/.ssh/id_rsa
 
     - name: Deploy frontend
       run: |
-        rsync -avz --delete client/build/ ${{ secrets.USER }}@${{ secrets.HOST }}:/var/www/html/
-
-    - name: Build backend
-      run: |
-        npm install
-        npm run build
+        scp -o StrictHostKeyChecking=no -r client/build/* ${{ secrets.USER }}@${{ secrets.HOST }}:/var/www/html/
 
     - name: Deploy backend
       run: |
-        rsync -avz --delete backend/ ${{ secrets.USER }}@${{ secrets.HOST }}:/home/${{ secrets.USER }}/backend/
-
-    - name: Restart backend service
-      run: |
-        ssh ${{ secrets.USER }}@${{ secrets.HOST }} 'pm2 restart all'
+        scp -o StrictHostKeyChecking=no -r * ${{ secrets.USER }}@${{ secrets.HOST }}:/path/to/backend/
+        ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} 'cd /path/to/backend && npm install && pm2 restart all'
