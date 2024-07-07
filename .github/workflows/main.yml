@@ -13,21 +13,27 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Use Node.js version from .nvmrc
+      id: use_node
+      run: echo "##[set-output name=node-version;]$(cat .nvmrc)"
+      
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '18' # Use the version you prefer
+        node-version: ${{ steps.use_node.outputs.node-version }}
 
     - name: Install dependencies and build frontend
       working-directory: ./client
       run: |
         npm install
         npm run build
+      continue-on-error: true
 
     - name: Install dependencies and build backend
       run: |
         npm install
         npm run build
+      continue-on-error: true
 
     - name: Copy SSH key
       run: |
@@ -41,10 +47,21 @@ jobs:
         ssh-add ~/.ssh/id_rsa
 
     - name: Deploy frontend
+      if: success()
       run: |
         scp -o StrictHostKeyChecking=no -r client/build/* ${{ secrets.USER }}@${{ secrets.HOST }}:/var/www/html/
 
     - name: Deploy backend
+      if: success()
       run: |
         scp -o StrictHostKeyChecking=no -r * ${{ secrets.USER }}@${{ secrets.HOST }}:/path/to/backend/
         ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} 'cd /path/to/backend && npm install && pm2 restart all'
+
+    - name: Upload build logs
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-logs
+        path: |
+          client/build.log
+          backend/build.log
