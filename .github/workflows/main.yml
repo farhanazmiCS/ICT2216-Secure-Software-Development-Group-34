@@ -31,6 +31,13 @@ jobs:
         npm install
         npm start
 
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0.3.0
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
+        export_default_credentials: true
+
     - name: Add SSH key to the agent
       uses: webfactory/ssh-agent@v0.5.3
       with:
@@ -38,12 +45,13 @@ jobs:
 
     - name: Deploy frontend
       run: |
-        scp -o StrictHostKeyChecking=no -r client/build/* ${{ secrets.USER }}@${{ secrets.HOST }}:/var/www/html/
+        gcloud compute ssh ${{ secrets.GCP_INSTANCE_NAME }} --zone ${{ secrets.GCP_ZONE }} --command "sudo rm -rf /var/www/html/*"
+        gcloud compute scp --recurse client/build/* ${{ secrets.GCP_INSTANCE_NAME }}:/var/www/html/ --zone ${{ secrets.GCP_ZONE }}
 
     - name: Deploy backend
       run: |
-        scp -o StrictHostKeyChecking=no -r * ${{ secrets.USER }}@${{ secrets.HOST }}:/path/to/backend/
-        ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} 'cd /path/to/backend && npm install && pm2 restart all'
+        gcloud compute scp --recurse * ${{ secrets.GCP_INSTANCE_NAME }}:/path/to/backend/ --zone ${{ secrets.GCP_ZONE }}
+        gcloud compute ssh ${{ secrets.GCP_INSTANCE_NAME }} --zone ${{ secrets.GCP_ZONE }} --command "cd /path/to/backend && npm install && pm2 restart all"
 
     - name: Upload build logs
       if: failure()
