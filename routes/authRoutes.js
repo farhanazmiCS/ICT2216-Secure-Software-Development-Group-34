@@ -20,8 +20,8 @@ const verifyCaptcha = async (req, res, next) => {
     }
   };
 
-router.post('/register', register, csrfProtection);
-router.post('/login', login, csrfProtection);
+router.post('/register', verifyCaptcha, register, csrfProtection);
+router.post('/login', verifyCaptcha, login, csrfProtection);
 router.get('/logout', logout);
 
 module.exports = router;
