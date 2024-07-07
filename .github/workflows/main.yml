@@ -12,15 +12,11 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
-    - name: Use Node.js version from .nvmrc
-      id: use_node
-      run: echo "##[set-output name=node-version;]$(cat .nvmrc)"
       
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: ${{ steps.use_node.outputs.node-version }}
+        node-version: 18
 
     - name: Install dependencies and build frontend
       working-directory: ./client
