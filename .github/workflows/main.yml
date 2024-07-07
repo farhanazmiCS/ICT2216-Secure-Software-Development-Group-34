@@ -34,7 +34,7 @@ jobs:
     - name: Install dependencies and build backend
       run: |
         npm install
-        npm run build
+        npm start
       continue-on-error: true
 
     - name: Copy SSH key
