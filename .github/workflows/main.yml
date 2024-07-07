@@ -28,6 +28,8 @@ jobs:
         npm install
         npm run build
       continue-on-error: true
+      env:
+        CI: false
 
     - name: Install dependencies and build backend
       run: |
