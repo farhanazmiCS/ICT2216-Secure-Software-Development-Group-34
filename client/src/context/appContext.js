@@ -314,9 +314,9 @@ const AppProvider = ({ children }) => {
       logout();
     }
   };
-  useEffect(() => {
+  /*useEffect(() => {
     getCurrentUser();
-  }, []);
+  }, []);*/
 
   return (
     <AppContext.Provider
