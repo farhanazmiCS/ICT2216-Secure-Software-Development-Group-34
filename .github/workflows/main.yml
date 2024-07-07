@@ -29,6 +29,7 @@ jobs:
     - name: Install dependencies and build backend
       run: |
         npm install
+        npm install connect-mongo
         npm start
 
     - name: Set up Google Cloud SDK
