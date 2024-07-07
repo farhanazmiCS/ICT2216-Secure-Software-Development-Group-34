@@ -6,10 +6,10 @@ import { Link } from 'react-router-dom'
 import { links } from '../utils/constants'
 import CartButtons from './CartButtons'
 import { usePetsContext } from '../context/pets_context'
-import { useUserContext } from '../context/user_context'
+import { useAppContext } from '../context/appContext'
 const Nav = () => {
   const { openSidebar } = usePetsContext()
-  const { myUser } = useUserContext()
+  const { user } = useAppContext()
   return (
     <NavContainer>
       <div className='nav-center'>
@@ -30,7 +30,7 @@ const Nav = () => {
               </li>
             )
           })}
-          {myUser && (
+          {user && (
             <li>
               <Link to='/checkout'>checkout</Link>
             </li>

@@ -9,7 +9,7 @@ import {
 } from '@stripe/react-stripe-js';
 import axios from 'axios';
 import { useCartContext } from '../context/cart_context';
-import { useUserContext } from '../context/user_context';
+import { useAppContext } from '../context/appContext';
 import { formatPrice } from '../utils/helpers';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,7 +17,7 @@ const promise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
 const CheckoutForm = () => {
   const { cart, total_amount, shipping_fee, clearCart } = useCartContext();
-  const { myUser } = useUserContext();
+  const { user } = useAppContext();
   const navigate = useNavigate();
   const [succeeded, setSucceeded] = useState(false);
   const [error, setError] = useState(null);
@@ -29,12 +29,12 @@ const CheckoutForm = () => {
 
   const createPaymentIntent = async () => {
     try {
-      const { data } = await axios.post(
-        '/.netlify/functions/create-payment-intent',
-
-        JSON.stringify({ cart, shipping_fee, total_amount })
-      );
-      setClientSecret(data.clientSecret);
+      // const { data } = await axios.post(
+      //   '/.netlify/functions/create-payment-intent',
+      //   JSON.stringify({ cart, shipping_fee, total_amount })
+      // );
+      // setClientSecret(data.clientSecret);
+      console.log("create payment intent")
     } catch (error) {
       // console.log(error.response)
     }
@@ -98,7 +98,7 @@ const CheckoutForm = () => {
         </article>
       ) : (
         <article>
-          <h4>Hello, {myUser && myUser.name}</h4>
+          <h4>Hello, {user && user.name}</h4>
           <p>Your total is {formatPrice(total_amount)}</p>
           <p>Test Card Number: 4242 4242 4242 4242</p>
         </article>

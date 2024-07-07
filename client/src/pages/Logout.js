@@ -4,13 +4,13 @@ import { useAppContext } from '../context/appContext';
 import { useNavigate } from 'react-router-dom';
 
 const Logout = () => {
-  const { logoutUser } = useAppContext();
+  const { logout } = useAppContext();
   const navigate = useNavigate();
 
   useEffect(() => {
-    logoutUser();
+    logout();
     navigate('/login');
-  }, [logoutUser, navigate]);
+  }, [logout, navigate]);
 
   return null;
 };

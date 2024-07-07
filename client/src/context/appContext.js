@@ -1,5 +1,5 @@
 import React, { useReducer, useContext, useEffect } from 'react';
-
+import Cookies from 'js-cookie';
 import reducer from './reducer';
 import axios from 'axios';
 import {
@@ -33,7 +33,7 @@ import {
   GET_CURRENT_USER_BEGIN,
   GET_CURRENT_USER_SUCCESS,
 } from '../actions';
-import Cookies from 'js-cookie';
+
 
 const getCSRFToken = () => {
   return Cookies.get('XSRF-TOKEN');
@@ -99,7 +99,7 @@ const AppProvider = ({ children }) => {
     (error) => {
       // console.log(error.response)
       if (error.response.status === 401) {
-        logoutUser();
+        logout();
       }
       return Promise.reject(error);
     }
@@ -156,7 +156,7 @@ const AppProvider = ({ children }) => {
     dispatch({ type: TOGGLE_SIDEBAR });
   };
 
-  const logoutUser = async () => {
+  const logout = async () => {
     await authFetch.get('/auth/logout');
     dispatch({ type: LOGOUT_USER });
     //removeUserFromLocalStorage({ session });
@@ -231,7 +231,7 @@ const AppProvider = ({ children }) => {
         },
       });
     } catch (error) {
-      logoutUser();
+      logout();
     }
     clearAlert();
   };
@@ -288,7 +288,7 @@ const AppProvider = ({ children }) => {
         },
       });
     } catch (error) {
-      logoutUser();
+      logout();
     }
     clearAlert();
   };
@@ -311,7 +311,7 @@ const AppProvider = ({ children }) => {
       });
     } catch (error) {
       if (error.response.status === 401) return;
-      logoutUser();
+      logout();
     }
   };
   useEffect(() => {
@@ -325,7 +325,7 @@ const AppProvider = ({ children }) => {
         displayAlert,
         setupUser,
         toggleSidebar,
-        logoutUser,
+        logout,
         updateUser,
         handleChange,
         clearValues,
