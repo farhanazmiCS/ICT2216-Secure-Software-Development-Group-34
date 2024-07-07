@@ -1,0 +1,47 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install SSH key
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_KEY }}
+
+    - name: Install Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Build frontend
+      run: |
+        cd client
+        npm install
+        npm run build
+
+    - name: Deploy frontend
+      run: |
+        rsync -avz --delete client/build/ ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.FRONTEND_PATH }}
+
+    - name: Build backend
+      run: |
+        npm install
+        npm run build
+
+    - name: Deploy backend
+      run: |
+        rsync -avz --delete backend/ ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.BACKEND_PATH }}
+
+    - name: Restart backend service
+      run: |
+        ssh ${{ secrets.USER }}@${{ secrets.HOST }} 'pm2 restart all'
