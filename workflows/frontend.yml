@@ -1,0 +1,41 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+      working-directory: client
+
+    - name: Build project
+      run: npm run build
+      working-directory: client
+
+    - name: Deploy to server
+      env:
+        HOST: ${{ secrets.HOST }}
+        USER: ${{ secrets.USER }}
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+        FRONTEND_PATH: ${{ secrets.FRONTEND_PATH }}
+      run: |
+        echo "$SSH_KEY" | tr -d '\r' | ssh-add - > /dev/null
+        rsync -avz -e "ssh -o StrictHostKeyChecking=no" --delete client/build/ $USER@$HOST:$FRONTEND_PATH
