@@ -17,6 +17,9 @@ const FeaturedPets = () => {
   if (error) {
     return <Error />
   }
+
+  const firstThreeFeaturedPets = Array.isArray(featured) ? featured.slice(0, 3) : []
+
   return (
     <Wrapper className='section'>
       <div className='title'>
@@ -24,7 +27,7 @@ const FeaturedPets = () => {
         <div className='underline'></div>
       </div>
       <div className='section-center featured'>
-        {featured.slice(0, 3).map((pet) => {
+        {firstThreeFeaturedPets.map((pet) => {
           return <Pet key={pet.id} {...pet} />
         })}
       </div>

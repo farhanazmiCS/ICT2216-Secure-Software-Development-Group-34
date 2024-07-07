@@ -8,6 +8,7 @@
     "client": "npm start --prefix client",
     "client:build": "npm run build --prefix client",
     "dev": "npm run client:build && npm run start",
+    "populate": "node populate.js",
     "test": "jest"
   },
   "author": "",

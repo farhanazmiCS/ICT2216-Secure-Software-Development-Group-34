@@ -13,8 +13,8 @@ const filter_reducer = (state, action) => {
   if (action.type === LOAD_PETS) {
     return {
       ...state,
-      all_pets: [...action.payload],
-      filtered_pets: [...action.payload],
+      all_pets: Array.isArray(action.payload) ? [...action.payload] : [],
+      filtered_pets: Array.isArray(action.payload) ? [...action.payload] : [],
     };
   }
   if (action.type === SET_GRIDVIEW) {

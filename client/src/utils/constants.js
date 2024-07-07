@@ -39,9 +39,9 @@ export const services = [
   },
 ];
 
-// export const pets_url = 'https://www.course-api.com/react-store-products';
+export const pets_url = '/api/v1/pets/';
 
-// export const single_pet_url = `https://www.course-api.com/react-store-single-product?id=`;
+export const single_pet_url = `/api/v1/pets/`;
 
-export const pets_url = '/utils/pets.json'
-export const single_pet_url = '/utils/pets_detail.json?id='
+// export const pets_url = '/utils/pets.json'
+// export const single_pet_url = '/utils/pets_detail.json?id='

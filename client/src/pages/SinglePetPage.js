@@ -39,7 +39,7 @@ const SinglePetPage = () => {
 
   if (loading) return <Loading />;
   if (error) return <Error />;
-
+  
   const {
     name,
     description,
@@ -53,7 +53,6 @@ const SinglePetPage = () => {
     adoption_requirements,
     personality_traits
   } = pet;
-
   return (
     <Wrapper>
       <PageHero title={name} pet />

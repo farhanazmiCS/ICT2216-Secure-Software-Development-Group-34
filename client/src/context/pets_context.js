@@ -14,8 +14,8 @@ import {
 } from '../actions';
 
 // Import local JSON data
-import petsData from '../utils/pets.json';
-import petsDetailData from '../utils/pets_detail.json';
+// import petsData from '../utils/pets.json';
+// import petsDetailData from '../utils/pets_detail.json';
 
 const initialState = {
   isSidebarOpen: false,
@@ -43,9 +43,10 @@ export const PetsProvider = ({ children }) => {
   const fetchPets = async (url) => {
     dispatch({ type: GET_PETS_BEGIN })
     try {
-      // const response = await axios.get(url);
-      // const pets = response.data;
-      const pets = petsData;
+      const response = await axios.get(url);
+      const pets = response.data.pets;
+      console.log(pets);
+      // const pets = petsData;
       dispatch({ type: GET_PETS_SUCCESS, payload: pets });
     } catch (error) {
       dispatch({ type: GET_PETS_ERROR })
@@ -54,9 +55,9 @@ export const PetsProvider = ({ children }) => {
   const fetchSinglePet = async (url, id) => {
     dispatch({ type: GET_SINGLE_PET_BEGIN })
     try {
-      // const response = await axios.get(url);
-      // const singlePet = response.data;
-      const singlePet = petsDetailData.find((pet) => pet.id === id);
+      const response = await axios.get(url);
+      const singlePet = response.data.pet;
+      // const singlePet = petsDetailData.find((pet) => pet.id === id);
       if (!singlePet) {
         throw new Error('Pet not found');
       }

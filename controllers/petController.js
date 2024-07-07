@@ -16,7 +16,7 @@ const getAllPets = async (req, res) => {
 const getSinglePet = async (req, res) => {
   const { id: petId } = req.params;
 
-  const pet = await Pet.findOne({ _id: petId }).populate('reviews');
+  const pet = await Pet.findOne({ _id: petId });
 
   if (!pet) {
     throw new CustomError.NotFoundError(`No pet with id : ${petId}`);

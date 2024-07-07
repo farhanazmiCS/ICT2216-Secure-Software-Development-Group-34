@@ -21,9 +21,8 @@ const pets_reducer = (state, action) => {
     return { ...state, pets_loading: true }
   }
   if (action.type === GET_PETS_SUCCESS) {
-    const featured_pets = action.payload.filter(
-      (pet) => pet.featured === true
-    )
+    const featured_pets = action.payload
+
     return {
       ...state,
       pets_loading: false,

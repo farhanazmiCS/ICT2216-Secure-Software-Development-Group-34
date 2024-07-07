@@ -6,10 +6,10 @@ const ListView = ({ pets }) => {
   return (
     <Wrapper>
       {pets.map((pet) => {
-        const { id, image, name, description, age, gender, vaccinated, spayed_neutered } = pet;
+        const { _id, thumbnail, name, description, age, gender, vaccinated, spayed_neutered } = pet;
         return (
-          <article key={id}>
-            <img src={image} alt={name} />
+          <article key={_id}>
+            <img src={thumbnail} alt={name} />
             <div>
               <h4>{name}</h4>
               <p className='desc'>{description.substring(0, 150)}...</p>
@@ -17,7 +17,7 @@ const ListView = ({ pets }) => {
               <p className='info'><span>Gender:</span> {gender}</p>
               <p className='info'><span>Vaccinated:</span> {vaccinated ? 'Yes' : 'No'}</p>
               <p className='info'><span>Spayed/Neutered:</span> {spayed_neutered ? 'Yes' : 'No'}</p>
-              <Link to={`/pets/${id}`} className='btn'>Details</Link>
+              <Link to={`/pets/${_id}`} className='btn'>Details</Link>
             </div>
           </article>
         );

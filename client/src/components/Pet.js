@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import { FaSearch } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
-const Pet = ({ image, name, id, age, gender }) => {
+const Pet = ({ thumbnail, name, _id, age, gender }) => {
   return (
     <Wrapper>
       <div className='container'>
-        <img src={image} alt={name} />
-        <Link to={`/pets/${id}`} className='link'>
+        <img src={thumbnail} alt={name} />
+        <Link to={`/pets/${_id}`} className='link'>
           <FaSearch />
         </Link>
       </div>
