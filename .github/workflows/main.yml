@@ -1,4 +1,4 @@
-name: Deploy Frontend and Backend
+name: Deploy Frontend
 
 on:
   push:
@@ -26,12 +26,6 @@ jobs:
       env:
         CI: false
 
-    - name: Install dependencies and build backend
-      run: |
-        npm install
-        npm install connect-mongo
-        npm start
-
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v0.3.0
       with:
@@ -49,16 +43,9 @@ jobs:
         gcloud compute ssh ${{ secrets.GCP_INSTANCE_NAME }} --zone ${{ secrets.GCP_ZONE }} --command "sudo rm -rf /var/www/html/*"
         gcloud compute scp --recurse client/build/* ${{ secrets.GCP_INSTANCE_NAME }}:/var/www/html/ --zone ${{ secrets.GCP_ZONE }}
 
-    - name: Deploy backend
-      run: |
-        gcloud compute scp --recurse * ${{ secrets.GCP_INSTANCE_NAME }}:/path/to/backend/ --zone ${{ secrets.GCP_ZONE }}
-        gcloud compute ssh ${{ secrets.GCP_INSTANCE_NAME }} --zone ${{ secrets.GCP_ZONE }} --command "cd /path/to/backend && npm install && pm2 restart all"
-
     - name: Upload build logs
       if: failure()
       uses: actions/upload-artifact@v2
       with:
         name: build-logs
-        path: |
-          client/build.log
-          backend/build.log
+        path: client/build.log
