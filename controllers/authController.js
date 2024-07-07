@@ -1,8 +1,13 @@
+const { isValidOTP } = require('../utils/otpUtils');
 const User = require('../models/User');
+const { createJWT } = require('../utils/jwt');
 const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
 const { attachCookiesToResponse, createTokenUser } = require('../utils');
 const session = require ('express-session')
+const { saveOTP } = require('../utils/otpUtils');
+const sendEmail = require('../utils/sendEmail');
+
 const register = async (req, res) => {
   const { email, name, password } = req.body;
 
@@ -18,7 +23,11 @@ const register = async (req, res) => {
   const user = await User.create({ name, email, password, role });
   const tokenUser = createTokenUser(user);
   attachCookiesToResponse({ res, user: tokenUser });
-  res.status(StatusCodes.CREATED).json({ user: tokenUser });
+  res.status(StatusCodes.CREATED).json({ 
+    user: tokenUser,
+    token: createJWT({ userId: user._id }),
+    location: user.location
+  });
 };
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -35,11 +44,14 @@ const login = async (req, res) => {
   if (!isPasswordCorrect) {
     throw new CustomError.UnauthenticatedError('Invalid Credentials');
   }
-  const tokenUser = createTokenUser(user);
-  attachCookiesToResponse({ res, user: tokenUser });
-  req.session.name = user._id;
+  const otp = await saveOTP(email);
+  await sendEmail(email, `Your OTP is: ${otp}`);
+  return res.status(StatusCodes.OK).json({ requiresOTP: true });
+  // const tokenUser = createTokenUser(user);
+  // attachCookiesToResponse({ res, user: tokenUser });
+  // req.session.name = user._id;
   //console.log(req.session.name);
-  res.status(StatusCodes.OK).json({ Login:true, user: tokenUser, session: req.session.name });
+  // res.status(StatusCodes.OK).json({ Login:true, user: tokenUser, session: req.session.name });
   //res.status(StatusCodes.OK).json({ user: tokenUser });
 };
 const logout = async (req, res) => {
@@ -55,9 +67,38 @@ const logout = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: 'user logged out!' });
 });
 };
+const verifyOTP = async (req, res) => {
+  const { otp, email } = req.body;
+
+  if (!otp || !email) {
+    throw new CustomError.BadRequestError('Please provide OTP and email');
+  }
+  
+  if (await isValidOTP(email, otp)) {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const tokenUser = createTokenUser(user);
+    attachCookiesToResponse({ res, user: tokenUser });
+    req.session.name = user._id;
+    
+    const token = createJWT({ userId: user._id });
+    res.status(StatusCodes.OK).json({ 
+      Login: true, 
+      user: tokenUser, 
+      session: req.session.name,
+      token 
+    });
+  } else {
+    res.status(400).json({ error: 'Invalid OTP' });
+  }
+};
 
 module.exports = {
   register,
   login,
   logout,
+  verifyOTP  
 };

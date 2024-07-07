@@ -4,6 +4,8 @@ import styled from 'styled-components'
 import { useAppContext } from '../context/appContext';
 import { useNavigate } from 'react-router-dom';
 import ReCAPTCHA from "react-google-recaptcha";
+import OTPVerification from '../components/OTPVerification';
+import axios from 'axios';
 
 const initialState = {
   name: '',
@@ -16,6 +18,9 @@ const Login = () => {
   const navigate = useNavigate();
   const [values, setValues] = useState(initialState);
   const [captchaValue, setCaptchaValue] = useState(null);
+  const [showOTP, setShowOTP] = useState(false);
+  const [otpEmail, setOtpEmail] = useState('');
+  const [otpValue, setOtpValue] = useState('');
   const handleCaptchaChange = (value) => {
     setCaptchaValue(value);
   };
@@ -29,31 +34,72 @@ const Login = () => {
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const { name, email, password, isMember } = values;
+
+    // Log the values to check if they are being captured correctly
+    console.log('Form values:', { name, email, password, isMember, captchaValue });
+  
     if (!email || !password || (!isMember && !name) || !captchaValue) {
       displayAlert();
       return;
     }
     const currentUser = { name, email, password, captchaValue };
-    if (isMember) {
-      setupUser({
-        currentUser,
-        endPoint: 'login',
-        alertText: 'Login Successful! Redirecting...',
-      });
-    } else {
-      setupUser({
-        currentUser,
-        endPoint: 'register',
-        alertText: 'User Created! Redirecting...',
-      });
+    try {
+      let response;
+      if (isMember) {
+        response = await axios.post('/api/v1/auth/login', currentUser);
+      } else {
+        response = await axios.post('/api/v1/auth/register', currentUser);
+      }
+
+      console.log('Server response:', response.data);
+      
+      if (response.data.requiresOTP) {
+        setShowOTP(true);
+        setOtpEmail(email);
+      } else {
+        handleLoginSuccess(response.data);
+      }
+    } catch (error) {
+      console.error(error);
+      displayAlert('Error', error.response?.data?.msg || 'Something went wrong');
     }
+    
+  };
+
+  const handleOTPVerify = async (e) => {
+    e.preventDefault();
+    if (!otpEmail) {
+      displayAlert('Please provide OTP');
+      return;
+    }
+    try {
+      const response = await axios.post('/api/v1/auth/verify-otp', { otp: otpEmail, email: values.email });
+      if (response.data.user) {
+        handleLoginSuccess(response.data);
+      }
+    } catch (error) {
+      console.error(error);
+      displayAlert('error', error.response?.data?.msg || 'Invalid OTP');
+    }
+  };
+
+  const handleLoginSuccess = (data) => {
+    const { user, token, location } = data;
+    console.log('Login success data:', data);
+    setupUser({
+      user,
+      token,
+      location,
+      alertText: 'Login Successful! Redirecting...',
+    });
   };
 
   useEffect(() => {
     if (user) {
+      console.log('User detected, navigating to home');
       setTimeout(() => {
         navigate('/');
       }, 3000);
@@ -120,6 +166,22 @@ const Login = () => {
             </button>
           </p>
         </form>
+
+        {showOTP && (
+          <form className='form' onSubmit={handleOTPVerify}>
+              <h3>Enter OTP</h3>
+              {showAlert && <Alert />}
+              <FormRow
+                type='text'
+                name='otp'
+                value={otpValue}
+                handleChange={(e) => setOtpValue(e.target.value)}
+              />
+              <button type='submit' className='btn btn-block' disabled={isLoading}>
+                Verify OTP
+              </button>
+            </form>
+        )}
       </Wrapper>
     </main>
 

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 
-const { register, login, logout } = require('../controllers/authController');
+const { register, login, logout, verifyOTP } = require('../controllers/authController');
 const csrfProtection = require('../middleware/csrfProtection');
 
 const verifyCaptcha = async (req, res, next) => {
@@ -23,5 +23,6 @@ const verifyCaptcha = async (req, res, next) => {
 router.post('/register', register, csrfProtection);
 router.post('/login', login, csrfProtection);
 router.get('/logout', logout);
+router.post('/verify-otp', verifyOTP);
 
 module.exports = router;
