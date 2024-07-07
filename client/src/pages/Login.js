@@ -3,8 +3,6 @@ import { PageHero, FormRow, Alert } from '../components';
 import styled from 'styled-components'
 import { useAppContext } from '../context/appContext';
 import { useNavigate } from 'react-router-dom';
-import ReCAPTCHA from "react-google-recaptcha";
-
 const initialState = {
   name: '',
   email: '',
@@ -15,10 +13,6 @@ const initialState = {
 const Login = () => {
   const navigate = useNavigate();
   const [values, setValues] = useState(initialState);
-  const [captchaValue, setCaptchaValue] = useState(null);
-  const handleCaptchaChange = (value) => {
-    setCaptchaValue(value);
-  };
   const { user, isLoading, showAlert, displayAlert, setupUser } =
     useAppContext();
 
@@ -32,11 +26,11 @@ const Login = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     const { name, email, password, isMember } = values;
-    if (!email || !password || (!isMember && !name) || !captchaValue) {
+    if (!email || !password || (!isMember && !name)) {
       displayAlert();
       return;
     }
-    const currentUser = { name, email, password, captchaValue };
+    const currentUser = { name, email, password };
     if (isMember) {
       setupUser({
         currentUser,
@@ -91,11 +85,7 @@ const Login = () => {
             value={values.password}
             handleChange={handleChange}
           />
-          <ReCAPTCHA
-            sitekey="6LczzwkqAAAAACXlUXtVKpOMGVQLZ2dtMMWG4tgK"
-            onChange={handleCaptchaChange}
-          />
-          <button type='submit' className='btn btn-block' disabled={isLoading || !captchaValue}>
+          <button type='submit' className='btn btn-block' disabled={isLoading}>
             submit
           </button>
           {/* <button

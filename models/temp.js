@@ -6,7 +6,7 @@
 const agg = [
   {
     $match: {
-      product: new ObjectId('615c873ad584c748cc86e5bb'),
+      pet: new ObjectId('615c873ad584c748cc86e5bb'),
     },
   },
   {

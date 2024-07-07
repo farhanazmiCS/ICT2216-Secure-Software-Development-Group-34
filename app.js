@@ -1,7 +1,7 @@
 require('dotenv').config();
 require('express-async-errors');
-// express
 
+// express
 const express = require('express');
 const app = express();
 // rest of the packages
@@ -15,14 +15,17 @@ const cors = require('cors');
 const mongoSanitize = require('express-mongo-sanitize');
 const path = require('path');
 const csrf = require('csurf');
-const session = require ('express-session')
+const session = require('express-session')
+
 // database
 const connectDB = require('./db/connect');
+
+
 
 //  routers
 const authRouter = require('./routes/authRoutes');
 const userRouter = require('./routes/userRoutes');
-const productRouter = require('./routes/productRoutes');
+const petRouter = require('./routes/petRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const orderRouter = require('./routes/orderRoutes');
 
@@ -66,19 +69,15 @@ app.use(session({
     maxAge: 1000*60*60
   }
 }))
-// app.use(express.static('./client/build'));
+
 app.use(fileUpload());
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
-app.use('/api/v1/products', productRouter);
+app.use('/api/v1/pets', petRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/orders', orderRouter);
 
-
-// app.get('*', (req, res) => {
-//   res.sendFile(path.resolve(__dirname, './client/build', 'index.html'));
-// });
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.resolve(__dirname, './client/build')));

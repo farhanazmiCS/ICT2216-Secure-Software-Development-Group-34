@@ -23,19 +23,19 @@ const ReviewSchema = mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    product: {
+    pet: {
       type: mongoose.Schema.ObjectId,
-      ref: 'Product',
+      ref: 'Pet',
       required: true,
     },
   },
   { timestamps: true }
 );
-ReviewSchema.index({ product: 1, user: 1 }, { unique: true });
+ReviewSchema.index({ pet: 1, user: 1 }, { unique: true });
 
-ReviewSchema.statics.calculateAverageRating = async function (productId) {
+ReviewSchema.statics.calculateAverageRating = async function (petId) {
   const result = await this.aggregate([
-    { $match: { product: productId } },
+    { $match: { pet: petId } },
     {
       $group: {
         _id: null,
@@ -46,8 +46,8 @@ ReviewSchema.statics.calculateAverageRating = async function (productId) {
   ]);
 
   try {
-    await this.model('Product').findOneAndUpdate(
-      { _id: productId },
+    await this.model('Pet').findOneAndUpdate(
+      { _id: petId },
       {
         averageRating: Math.ceil(result[0]?.averageRating || 0),
         numOfReviews: result[0]?.numOfReviews || 0,
@@ -59,11 +59,11 @@ ReviewSchema.statics.calculateAverageRating = async function (productId) {
 };
 
 ReviewSchema.post('save', async function () {
-  await this.constructor.calculateAverageRating(this.product);
+  await this.constructor.calculateAverageRating(this.pet);
 });
 
 ReviewSchema.post('remove', async function () {
-  await this.constructor.calculateAverageRating(this.product);
+  await this.constructor.calculateAverageRating(this.pet);
 });
 
 module.exports = mongoose.model('Review', ReviewSchema);

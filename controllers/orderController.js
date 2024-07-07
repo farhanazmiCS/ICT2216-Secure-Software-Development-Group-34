@@ -1,5 +1,5 @@
 const Order = require('../models/Order');
-const Product = require('../models/Product');
+const Pet = require('../models/Pet');
 
 const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
@@ -26,19 +26,19 @@ const createOrder = async (req, res) => {
   let subtotal = 0;
 
   for (const item of cartItems) {
-    const dbProduct = await Product.findOne({ _id: item.product });
-    if (!dbProduct) {
+    const dbPet = await Pet.findOne({ _id: item.pet });
+    if (!dbPet) {
       throw new CustomError.NotFoundError(
-        `No product with id : ${item.product}`
+        `No pet with id : ${item.pet}`
       );
     }
-    const { name, price, image, _id } = dbProduct;
+    const { name, price, image, _id } = dbPet;
     const singleOrderItem = {
       amount: item.amount,
       name,
       price,
       image,
-      product: _id,
+      pet: _id,
     };
     // add item to order
     orderItems = [...orderItems, singleOrderItem];

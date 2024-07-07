@@ -1,27 +1,27 @@
 const Review = require('../models/Review');
-const Product = require('../models/Product');
+const Pet = require('../models/Pet');
 
 const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
 const { checkPermissions } = require('../utils');
 
 const createReview = async (req, res) => {
-  const { product: productId } = req.body;
+  const { pet: petId } = req.body;
 
-  const isValidProduct = await Product.findOne({ _id: productId });
+  const isValidPet = await Pet.findOne({ _id: petId });
 
-  if (!isValidProduct) {
-    throw new CustomError.NotFoundError(`No product with id : ${productId}`);
+  if (!isValidPet) {
+    throw new CustomError.NotFoundError(`No pet with id : ${petId}`);
   }
 
   const alreadySubmitted = await Review.findOne({
-    product: productId,
+    pet: petId,
     user: req.user.userId,
   });
 
   if (alreadySubmitted) {
     throw new CustomError.BadRequestError(
-      'Already submitted review for this product'
+      'Already submitted review for this pet'
     );
   }
 
@@ -31,7 +31,7 @@ const createReview = async (req, res) => {
 };
 const getAllReviews = async (req, res) => {
   const reviews = await Review.find({}).populate({
-    path: 'product',
+    path: 'pet',
     select: 'name company price',
   });
 
@@ -81,9 +81,9 @@ const deleteReview = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: 'Success! Review removed' });
 };
 
-const getSingleProductReviews = async (req, res) => {
-  const { id: productId } = req.params;
-  const reviews = await Review.find({ product: productId });
+const getSinglePetReviews = async (req, res) => {
+  const { id: petId } = req.params;
+  const reviews = await Review.find({ pet: petId });
   res.status(StatusCodes.OK).json({ reviews, count: reviews.length });
 };
 
@@ -93,5 +93,5 @@ module.exports = {
   getSingleReview,
   updateReview,
   deleteReview,
-  getSingleProductReviews,
+  getSinglePetReviews,
 };
