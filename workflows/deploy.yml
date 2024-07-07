@@ -31,16 +31,17 @@ jobs:
 
     - name: Deploy frontend
       run: |
-        rsync -avz --delete client/build/ ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.FRONTEND_PATH }}
+        rsync -avz --delete client/build/ ${{ secrets.USER }}@${{ secrets.HOST }}:/var/www/html/
 
     - name: Build backend
       run: |
+        cd backend
         npm install
         npm run build
 
     - name: Deploy backend
       run: |
-        rsync -avz --delete backend/ ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.BACKEND_PATH }}
+        rsync -avz --delete backend/ ${{ secrets.USER }}@${{ secrets.HOST }}:/home/${{ secrets.USER }}/backend/
 
     - name: Restart backend service
       run: |
