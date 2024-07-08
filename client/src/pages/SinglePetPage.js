@@ -78,7 +78,7 @@ const SinglePetPage = () => {
               ))}
             </div>
             <hr />
-            <AddToCart pet={pet} />
+            {user ? <AddToCart pet={pet} /> : <p>Please log in to adopt the pet.</p>}
           </section>
         </div>
       </div>
