@@ -1,22 +1,48 @@
 import React from 'react';
 import { GiCompass, GiDiamondHard, GiStabbedNote } from 'react-icons/gi';
-export const links = [
-  {
-    id: 1,
-    text: 'home',
-    url: '/',
-  },
-  {
-    id: 2,
-    text: 'about',
-    url: '/about',
-  },
-  {
-    id: 3,
-    text: 'pets',
-    url: '/pets',
-  },
-];
+import { useAppContext } from '../context/appContext';
+
+export const useLinks = () => {
+  const { user } = useAppContext();
+
+  const baseLinks = [
+    {
+      id: 1,
+      text: 'home',
+      url: '/',
+    },
+    {
+      id: 2,
+      text: 'about',
+      url: '/about',
+    },
+    {
+      id: 3,
+      text: 'pets',
+      url: '/pets',
+    },
+  ];
+
+  //Roles page is only accessible by admin users
+  if (user && user.role === 'admin') {
+    baseLinks.push({
+      id: 4,
+      text: 'roles',
+      url: '/roles',
+    });
+  }
+
+  //Processing of adoption page is only accessible by staff users
+  else if (user && user.role === 'staff') {
+    baseLinks.push({
+      id: 5,
+      text: 'adoption',
+      url: '/adoption',
+    });
+  }
+
+  return baseLinks;
+};
 
 export const services = [
   {
