@@ -76,8 +76,8 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
           cd ~/repo
-          sudo chmod -R 755 node_modules
-          sudo chmod +x node_modules/.bin/cross-env
+          chmod -R 755 node_modules
+          chmod +x node_modules/.bin/cross-env
           npm install
           npm run setup-start
         EOF
