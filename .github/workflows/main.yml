@@ -51,3 +51,43 @@ jobs:
           echo "CSR, Cert, and Key files created."
           ls -la
         EOF
+
+    - name: SSH into server to clone repository
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+        HOST_IP: ${{ secrets.HOST_IP }}
+        NAME: ${{ secrets.NAME }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+          cd ~/repo
+          git clone https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git .
+        EOF
+
+    - name: SSH into server to build frontend and backend
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+        HOST_IP: ${{ secrets.HOST_IP }}
+        NAME: ${{ secrets.NAME }}
+      run: |
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+          cd ~/repo
+          npm install
+          npm run setup-start
+        EOF
+
+    - name: Copy frontend build files to the server
+      run: |
+        scp -r -o StrictHostKeyChecking=no client/build/* ${{ secrets.NAME }}@${{ secrets.HOST_IP }}:/var/www/html/
+
+    - name: Copy all files to the server root
+      run: |
+        scp -r -o StrictHostKeyChecking=no * ${{ secrets.NAME }}@${{ secrets.HOST_IP }}:~/
+
+    - name: SSH into server and restart services
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.NAME }}@${{ secrets.HOST_IP }} << 'EOF'
+          cd ~
+          sudo cp -r repo/client/build/* /var/www/html/
+          sudo systemctl restart nginx
+        EOF
