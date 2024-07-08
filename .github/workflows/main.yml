@@ -24,7 +24,7 @@ jobs:
         HOST_IP: ${{ secrets.HOST_IP }}
         NAME: ${{ secrets.NAME }}
       run: |
-        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+        ssh -o StrictHostKeyChecking=no -t $NAME@$HOST_IP << 'EOF'
           # Check if repo directory exists, if not create it, else cd into it
           cd ~
           if [ ! -d repo ]; then
@@ -42,7 +42,7 @@ jobs:
         HOST_IP: ${{ secrets.HOST_IP }}
         NAME: ${{ secrets.NAME }}
       run: |
-        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+        ssh -o StrictHostKeyChecking=no -t $NAME@$HOST_IP << 'EOF'
           cd ~/repo
           # Create key.pem, cert.pem, and csr.pem certificates
           openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout key.pem -out cert.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
@@ -58,7 +58,7 @@ jobs:
         NAME: ${{ secrets.NAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
-        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+        ssh -o StrictHostKeyChecking=no -t $NAME@$HOST_IP << 'EOF'
           cd ~/repo
           git init
           git remote add origin https://$GH_TOKEN@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git
@@ -74,7 +74,7 @@ jobs:
         HOST_IP: ${{ secrets.HOST_IP }}
         NAME: ${{ secrets.NAME }}
       run: |
-        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+        ssh -o StrictHostKeyChecking=no -t $NAME@$HOST_IP << 'EOF'
           cd ~/repo
           chmod -R 755 node_modules
           chmod +x node_modules/.bin/cross-env
