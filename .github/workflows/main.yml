@@ -39,19 +39,33 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
           # Set environment variables
-          echo "MONGO_URL=${MONGO_URL}" >> ~/.bashrc
-          echo "MONGO_URI=${MONGO_URI}" >> ~/.bashrc
-          echo "BACKEND_PORT=${BACKEND_PORT}" >> ~/.bashrc
-          echo "JWT_SECRET=${JWT_SECRET}" >> ~/.bashrc
-          echo "JWT_LIFETIME=${JWT_LIFETIME}" >> ~/.bashrc
-          echo "NODE_ENV=${NODE_ENV}" >> ~/.bashrc
-          echo "EMAIL_HOST=${EMAIL_HOST}" >> ~/.bashrc
-          echo "EMAIL_PORT=${EMAIL_PORT}" >> ~/.bashrc
-          echo "EMAIL_SECURE=${EMAIL_SECURE}" >> ~/.bashrc
-          echo "EMAIL_USER=${EMAIL_USER}" >> ~/.bashrc
-          echo "EMAIL_PASS=${EMAIL_PASS}" >> ~/.bashrc
-          echo "EMAIL_FROM=${EMAIL_FROM}" >> ~/.bashrc
+          echo "export MONGO_URL=${MONGO_URL}" >> ~/.bashrc
+          echo "export MONGO_URI=${MONGO_URI}" >> ~/.bashrc
+          echo "export BACKEND_PORT=${BACKEND_PORT}" >> ~/.bashrc
+          echo "export JWT_SECRET=${JWT_SECRET}" >> ~/.bashrc
+          echo "export JWT_LIFETIME=${JWT_LIFETIME}" >> ~/.bashrc
+          echo "export NODE_ENV=${NODE_ENV}" >> ~/.bashrc
+          echo "export EMAIL_HOST=${EMAIL_HOST}" >> ~/.bashrc
+          echo "export EMAIL_PORT=${EMAIL_PORT}" >> ~/.bashrc
+          echo "export EMAIL_SECURE=${EMAIL_SECURE}" >> ~/.bashrc
+          echo "export EMAIL_USER=${EMAIL_USER}" >> ~/.bashrc
+          echo "export EMAIL_PASS=${EMAIL_PASS}" >> ~/.bashrc
+          echo "export EMAIL_FROM=${EMAIL_FROM}" >> ~/.bashrc
           source ~/.bashrc
+
+          # Verify environment variables
+          echo "MONGO_URL: $MONGO_URL"
+          echo "MONGO_URI: $MONGO_URI"
+          echo "BACKEND_PORT: $BACKEND_PORT"
+          echo "JWT_SECRET: $JWT_SECRET"
+          echo "JWT_LIFETIME: $JWT_LIFETIME"
+          echo "NODE_ENV: $NODE_ENV"
+          echo "EMAIL_HOST: $EMAIL_HOST"
+          echo "EMAIL_PORT: $EMAIL_PORT"
+          echo "EMAIL_SECURE: $EMAIL_SECURE"
+          echo "EMAIL_USER: $EMAIL_USER"
+          echo "EMAIL_PASS: $EMAIL_PASS"
+          echo "EMAIL_FROM: $EMAIL_FROM"
 
           # Install Node.js 14.x
           curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
