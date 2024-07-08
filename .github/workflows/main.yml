@@ -1,4 +1,4 @@
-name: Deploy Frontend and Backend
+name: Deploy Frontend & Backend
 
 on:
   push:
