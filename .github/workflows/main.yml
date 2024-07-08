@@ -26,7 +26,7 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
         MONGO_URL: ${{ secrets.MONGO_URL }}
         MONGO_URI: ${{ secrets.MONGO_URI }}
-        BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+        PORT: ${{ secrets.BACKEND_PORT }}
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
         JWT_LIFETIME: ${{ secrets.JWT_LIFETIME }}
         NODE_ENV: ${{ secrets.NODE_ENV }}
