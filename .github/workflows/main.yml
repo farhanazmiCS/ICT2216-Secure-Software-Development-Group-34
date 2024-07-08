@@ -24,10 +24,18 @@ jobs:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
     - name: SSH into server and build
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+        HOST_IP: ${{ secrets.HOST_IP }}
+        NAME: ${{ secrets.NAME }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.NAME }}@${{ secrets.HOST_IP }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
           cd ~
-          git clone https://github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git repo
+          if [ -d repo ]; then
+            rm -rf repo
+          fi
+          git clone https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git repo
           cd repo
           npm install
           npm run setup-start
