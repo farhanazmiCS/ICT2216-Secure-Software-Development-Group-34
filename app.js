@@ -136,8 +136,8 @@ const start = async () => {
     http.createServer((req, res) => {
       res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
       res.end();
-    }).listen(11818, '127.0.0.1', () =>
-      console.log(`HTTP to HTTPS redirect server is listening on port 11818...`)
+    }).listen(port, '127.0.0.1', () =>
+      console.log(`HTTP to HTTPS redirect server is listening on port ${port}...`)
     );
 
   } catch (error) {
