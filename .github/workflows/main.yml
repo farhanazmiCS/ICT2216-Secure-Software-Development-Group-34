@@ -1,4 +1,4 @@
-name: Deployment
+name: Deploy Frontend and Backend
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
-    - name: SSH into server, create/check repo directory, and clear the repo directory except for .env and cert files
+    - name: SSH into server, create/check repo directory, and clear the repo directory except for .env file
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
@@ -32,8 +32,8 @@ jobs:
           fi
           cd repo
 
-          # Remove all files except .env and cert files
-          find . -type f ! -name '.env' ! -name 'key.pem' ! -name 'cert.pem' ! -name 'csr.pem' -delete
+          # Remove all files except .env
+          find . -type f ! -name '.env' -delete
         EOF
 
     - name: SSH into server to create key.pem, cert.pem, and csr.pem certificates
@@ -44,16 +44,14 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
           cd ~/repo
-          # Create key.pem, cert.pem, and csr.pem certificates if they don't exist
-          if [ ! -f key.pem ]; then
-            openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout key.pem -out cert.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
-            openssl req -new -key key.pem -out csr.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
-          fi
+          # Create key.pem, cert.pem, and csr.pem certificates
+          openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout key.pem -out cert.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
+          openssl req -new -key key.pem -out csr.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
           echo "CSR, Cert, and Key files created."
           ls -la
         EOF
 
-    - name: SSH into server to pull latest code
+    - name: SSH into server to pull repository and create .env file
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
@@ -63,11 +61,14 @@ jobs:
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
           cd ~/repo
           git init
-          git remote add origin https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git || true
+          git remote add origin https://github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git
           git pull origin main
+
+          # Verify environment variables
+          cat .env
         EOF
 
-    - name: SSH into server to create .env file if it doesn't exist
+    - name: SSH into server to run build commands
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
@@ -75,8 +76,8 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
           cd ~/repo
-          
-          # Run build commands
+          sudo chmod -R 755 node_modules
+          sudo chmod +x node_modules/.bin/cross-env
           npm install
           npm run setup-start
         EOF
