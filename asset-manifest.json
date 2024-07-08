@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/static/css/main.393752d1.css",
-    "main.js": "/static/js/main.8df1ab1b.js",
-    "static/media/hero-bcg.jpeg": "/static/media/hero-bcg.a876f19f6786a3aca992.jpeg",
-    "static/media/hero-bcg-2.jpeg": "/static/media/hero-bcg-2.789918645915c8acb36f.jpeg",
-    "static/media/logo.jpg": "/static/media/logo.e928f8f25eacef274a73.jpg",
-    "static/media/logo.svg": "/static/media/logo.221f6b13e6eaaad5828372464f73a1a4.svg",
-    "index.html": "/index.html",
-    "main.393752d1.css.map": "/static/css/main.393752d1.css.map",
-    "main.8df1ab1b.js.map": "/static/js/main.8df1ab1b.js.map"
+    "main.css": "/ICT2216-Secure-Software-Development-Group-34/static/css/main.393752d1.css",
+    "main.js": "/ICT2216-Secure-Software-Development-Group-34/static/js/main.f562de39.js",
+    "static/media/hero-bcg.jpeg": "/ICT2216-Secure-Software-Development-Group-34/static/media/hero-bcg.a876f19f6786a3aca992.jpeg",
+    "static/media/hero-bcg-2.jpeg": "/ICT2216-Secure-Software-Development-Group-34/static/media/hero-bcg-2.789918645915c8acb36f.jpeg",
+    "static/media/logo.jpg": "/ICT2216-Secure-Software-Development-Group-34/static/media/logo.e928f8f25eacef274a73.jpg",
+    "static/media/logo.svg": "/ICT2216-Secure-Software-Development-Group-34/static/media/logo.221f6b13e6eaaad5828372464f73a1a4.svg",
+    "index.html": "/ICT2216-Secure-Software-Development-Group-34/index.html",
+    "main.393752d1.css.map": "/ICT2216-Secure-Software-Development-Group-34/static/css/main.393752d1.css.map",
+    "main.f562de39.js.map": "/ICT2216-Secure-Software-Development-Group-34/static/js/main.f562de39.js.map"
   },
   "entrypoints": [
     "static/css/main.393752d1.css",
-    "static/js/main.8df1ab1b.js"
+    "static/js/main.f562de39.js"
   ]
 }
