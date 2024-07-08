@@ -32,6 +32,10 @@ import {
   CHANGE_PAGE,
   GET_CURRENT_USER_BEGIN,
   GET_CURRENT_USER_SUCCESS,
+  UPDATE_USER_ROLE_SUCCESS,
+  UPDATE_USER_ROLE_ERROR,
+  GET_USERS_SUCCESS,
+  GET_USERS_ERROR,
 } from '../actions';
 
 
@@ -314,6 +318,42 @@ const AppProvider = ({ children }) => {
       logout();
     }
   };
+
+  //Function to update role
+  const updateUserRole = async (userId, role) => {
+    try {
+      await authFetch.patch(`/users/${userId}/role`, { role });
+      dispatch({
+        type: UPDATE_USER_ROLE_SUCCESS,
+        payload: { msg: 'User role updated successfully' },
+      });
+    } catch (error) {
+      if (error.response.status !== 401) {
+        dispatch({
+          type: UPDATE_USER_ROLE_ERROR,
+          payload: { msg: error.response.data.msg },
+        });
+      }
+    }
+    clearAlert();
+  };
+
+  //Function to get users from the database
+  const getUsers = async () => {
+    try {
+      const { data } = await authFetch('/users');
+      dispatch({
+        type: GET_USERS_SUCCESS,
+        payload: data.users,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_USERS_ERROR,
+        payload: { msg: error.response.data.msg },
+      });
+    }
+  };
+
   /*useEffect(() => {
     getCurrentUser();
   }, []);*/
@@ -337,6 +377,8 @@ const AppProvider = ({ children }) => {
         showStats,
         clearFilters,
         changePage,
+        updateUserRole,
+        getUsers,
       }}
     >
       {children}
