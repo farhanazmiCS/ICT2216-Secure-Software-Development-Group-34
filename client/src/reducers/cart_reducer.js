@@ -3,6 +3,7 @@ import {
   CLEAR_CART,
   COUNT_CART_TOTALS,
   REMOVE_CART_ITEM,
+  ADD_ADOPTION_REQUEST,
 } from '../actions'
 
 const cart_reducer = (state, action) => {
@@ -31,6 +32,11 @@ const cart_reducer = (state, action) => {
     const total_items = state.cart.length;
     return { ...state, total_items }
   }
+
+  if (action.type === ADD_ADOPTION_REQUEST) {
+    return { ...state, adoption_requests: [...state.adoption_requests, action.payload] };
+  }
+
   throw new Error(`No Matching "${action.type}" - action type`)
 }
 
