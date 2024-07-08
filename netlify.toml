@@ -1,0 +1,3 @@
+[build]
+  command = "./generate_pem_files.sh && npm run build"
+  publish = "build"
