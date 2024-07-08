@@ -18,25 +18,29 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
-    - name: SSH into server and check connection
+    - name: SSH into server, create/check repo directory, and create .pem files
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
         NAME: ${{ secrets.NAME }}
       run: |
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
-          echo "SSH connection successful!"
-          ls -la ~
-        EOF
+          # Create/check repo directory
+          cd ~
+          if [ ! -d repo ]; then
+            mkdir -p repo
+          else
+            cd repo
+          fi
 
-    - name: SSH into server and create .pem files
-      env:
-        SSH_KEY: ${{ secrets.SSH_KEY }}
-        HOST_IP: ${{ secrets.HOST_IP }}
-        NAME: ${{ secrets.NAME }}
-      run: |
-        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
-          cd ~/repo
+          # Clear repository
+          rm -rf repo
+
+          # Create new repo directory and navigate into it
+          mkdir repo
+          cd repo
+
+          # Create key.pem, cert.pem, and csr.pem certificates
           openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout key.pem -out cert.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
           openssl req -new -key key.pem -out csr.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
           echo "CSR, Cert, and Key files created."
