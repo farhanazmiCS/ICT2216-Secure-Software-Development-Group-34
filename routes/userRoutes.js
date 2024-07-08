@@ -10,6 +10,7 @@ const {
   showCurrentUser,
   updateUser,
   updateUserPassword,
+  updateUserRole,
 } = require('../controllers/userController');
 
 router
@@ -19,6 +20,10 @@ router
 router.route('/showMe').get(authenticateUser, showCurrentUser);
 router.route('/updateUser').patch(authenticateUser, updateUser);
 router.route('/updateUserPassword').patch(authenticateUser, updateUserPassword);
+
+// Route for updating user role by ID (admin only)
+router.patch('/:id/role', authenticateUser, authorizePermissions('admin'), updateUserRole);
+
 
 router.route('/:id').get(authenticateUser, getSingleUser);
 
