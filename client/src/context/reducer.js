@@ -28,6 +28,10 @@ import {
   CHANGE_PAGE,
   GET_CURRENT_USER_BEGIN,
   GET_CURRENT_USER_SUCCESS,
+  UPDATE_USER_ROLE_SUCCESS,
+  UPDATE_USER_ROLE_ERROR,
+  GET_USERS_SUCCESS,
+  GET_USERS_ERROR,
 } from '../actions';
 
 import { initialState } from './appContext';
@@ -256,7 +260,41 @@ const reducer = (state, action) => {
       jobLocation: action.payload.location,
     };
   }
-  throw new Error(`no such action : ${action.type}`);
+  if (action.type === UPDATE_USER_ROLE_SUCCESS){
+    return {
+      ...state,
+      showAlert: true,
+      alertType: 'success',
+      alertText: action.payload.msg,
+    };
+  } 
+      
+  if (action.type === UPDATE_USER_ROLE_ERROR){
+    return {
+      ...state,
+      showAlert: true,
+      alertType: 'danger',
+      alertText: action.payload.msg,
+    };
+  } 
+      
+  if(action.type === GET_USERS_SUCCESS){
+    return {
+      ...state,
+      users: action.payload,
+    };
+  } 
+      
+  if(action.type === GET_USERS_ERROR){
+    return {
+      ...state,
+      showAlert: true,
+      alertType: 'danger',
+      alertText: action.payload.msg,
+    };
+  } 
+  
+  throw new Error(`No matching "${action.type}" action type`);
 };
 
 export default reducer;
