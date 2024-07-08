@@ -18,41 +18,35 @@ jobs:
       with:
         node-version: 18
 
-    - name: Install dependencies and build frontend and backend
+    - name: Install dependencies and build frontend
+      working-directory: ./client
       run: |
         npm install
-        npm run setup-start
+        npm run build
       env:
         CI: false
 
-    - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v0.3.0
-      with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
-        export_default_credentials: true
+    - name: Install dependencies and build backend
+      run: |
+        npm install
 
-    - name: Add SSH key to the agent
+    - name: Set up SSH
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
-    - name: Deploy frontend
+    - name: Copy frontend build files to the server
       run: |
-        gcloud compute ssh ${{ secrets.GCP_INSTANCE_NAME }} --zone ${{ secrets.GCP_ZONE }} --command "sudo rm -rf /var/www/html/*"
-        gcloud compute scp --recurse client/build/* ${{ secrets.GCP_INSTANCE_NAME }}:/var/www/html/ --zone ${{ secrets.GCP_ZONE }}
+        scp -r -o StrictHostKeyChecking=no client/build/* ${{ secrets.NAME }}@${{ secrets.HOST_IP }}:/var/www/html/
 
-    - name: Deploy backend
+    - name: Copy all files to the server root
       run: |
-        gcloud compute ssh ${{ secrets.GCP_INSTANCE_NAME }} --zone ${{ secrets.GCP_ZONE }} --command "sudo pm2 stop all || true"
-        gcloud compute scp --recurse * ${{ secrets.GCP_INSTANCE_NAME }}:/path/to/backend/ --zone ${{ secrets.GCP_ZONE }}
-        gcloud compute ssh ${{ secrets.GCP_INSTANCE_NAME }} --zone ${{ secrets.GCP_ZONE }} --command "cd /path/to/backend && npm install && sudo pm2 start app.js"
+        scp -r -o StrictHostKeyChecking=no * ${{ secrets.NAME }}@${{ secrets.HOST_IP }}:~/
 
-    - name: Upload build logs
-      if: failure()
-      uses: actions/upload-artifact@v2
-      with:
-        name: build-logs
-        path: |
-          client/build.log
-          backend/build.log
+    - name: SSH into server and build
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.NAME }}@${{ secrets.HOST_IP }} << 'EOF'
+          cd ~
+          npm install
+          npm run setup-start
+        EOF
