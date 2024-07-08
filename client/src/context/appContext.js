@@ -72,6 +72,7 @@ const initialState = {
   searchType: 'all',
   sort: 'latest',
   sortOptions: ['latest', 'oldest', 'a-z', 'z-a'],
+  users: [],
 };
 
 const AppContext = React.createContext();
