@@ -10,12 +10,15 @@ import {
   AddToCart,
   PageHero,
 } from '../components';
+
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { useAppContext } from '../context/appContext';
 
 const SinglePetPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAppContext();
   const {
     single_pet_loading: loading,
     single_pet_error: error,
