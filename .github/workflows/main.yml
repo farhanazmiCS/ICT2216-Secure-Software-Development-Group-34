@@ -62,8 +62,7 @@ jobs:
           cd ~/repo
           git init
           git remote add origin https://$GH_TOKEN@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git
-          git fetch origin
-          git reset --hard origin/main
+          git pull origin main
 
           # Verify environment variables
           cat .env
