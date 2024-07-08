@@ -3,7 +3,7 @@ import logo from '../assets/logo.svg'
 import { Link } from 'react-router-dom'
 import { usePetsContext } from '../context/pets_context'
 import { FaTimes } from 'react-icons/fa'
-import { links } from '../utils/constants'
+import { useLinks } from '../utils/constants'
 import styled from 'styled-components'
 import CartButtons from './CartButtons'
 import { useAppContext } from '../context/appContext'
@@ -11,11 +11,11 @@ import { useAppContext } from '../context/appContext'
 const Sidebar = () => {
   const { isSidebarOpen, closeSidebar } = usePetsContext()
   const { user } = useAppContext()
+  const links = useLinks() // Use the useLinks hook to get the dynamically generated links
+
   return (
     <SidebarContainer>
-      <aside
-        className={`${isSidebarOpen ? 'sidebar show-sidebar' : 'sidebar'}`}
-      >
+      <aside className={`${isSidebarOpen ? 'sidebar show-sidebar' : 'sidebar'}`}>
         <div className='sidebar-header'>
           <img src={logo} className='logo' alt='coding addict' />
           <button className='close-btn' onClick={closeSidebar}>
@@ -37,8 +37,8 @@ const Sidebar = () => {
               <Link to='/checkout' onClick={closeSidebar}>
                 checkout
               </Link>
-            </li>
-          )}
+            )
+            </li>)}
         </ul>
         <CartButtons />
       </aside>
