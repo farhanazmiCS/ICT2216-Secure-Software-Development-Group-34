@@ -60,22 +60,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URI,
-      ttl: 14 * 24 * 60 * 60 // = 14 days. Default
-    }),
-    cookie: {
-      secure: false,
-      maxAge: 1000 * 60 * 60,
-    },
-  })
-);
-
 // Static file serving for production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.resolve(__dirname, './client/build')));
@@ -101,30 +85,9 @@ app.use(errorHandlerMiddleware);
 const port = process.env.PORT || 5000;
 const start = async () => {
   try {
-    console.log('MongoDB URI:', process.env.MONGO_URI); // Debugging line
     await connectDB(process.env.MONGO_URI);
-
-    // (https) Load SSL certificates
-    const keyPath = path.resolve(__dirname, 'key.pem'); // (https) Adjusted path
-    const certPath = path.resolve(__dirname, 'cert.pem'); // (https) Adjusted path
-
-    if (!fs.existsSync(keyPath)) {
-      throw new Error(`Key file not found at path: ${keyPath}`);
-    }
-    if (!fs.existsSync(certPath)) {
-      throw new Error(`Cert file not found at path: ${certPath}`);
-    }
-
-    const options = {
-      key: fs.readFileSync(keyPath), // (https) Adjust the path
-      cert: fs.readFileSync(certPath), // (https) Adjust the path
-    };
-
-    console.log('SSL certificates loaded from:', keyPath, certPath); // (https) Debugging line
-
-    // (https) Create HTTPS server
-    https.createServer(options, app).listen(port, () =>
-      console.log(`HTTPS Server is listening on port ${port}...`)
+    app.listen(port, () =>
+      console.log(`Server is listening on port ${port}...`)
     );
 
     // (https) Create HTTP server to redirect to HTTPS
