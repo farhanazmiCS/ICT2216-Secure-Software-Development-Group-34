@@ -25,24 +25,16 @@ jobs:
         NAME: ${{ secrets.NAME }}
       run: |
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
-          # Create/check repo directory
+          # Check if repo directory exists, if not create it, else cd into it
           cd ~
           if [ ! -d repo ]; then
             mkdir -p repo
-          else
-            cd repo
           fi
-
-          # Clear repository
-          rm -rf repo
-
-          # Create new repo directory and navigate into it
-          mkdir repo
           cd repo
+
+          # Clear the repo directory
+          rm -rf *
 
           # Create key.pem, cert.pem, and csr.pem certificates
           openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout key.pem -out cert.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
-          openssl req -new -key key.pem -out csr.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
-          echo "CSR, Cert, and Key files created."
-          ls -la
-        EOF
+          openssl req -new -key key.pem -out csr.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=​⬤
