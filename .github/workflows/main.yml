@@ -18,7 +18,7 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
-    - name: SSH into server and set up
+    - name: SSH into server, create/check repo directory, and clear the repo directory except for .env file
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
@@ -35,8 +35,7 @@ jobs:
 
           # Remove all files except .env
           find . -type f ! -name '.env' -delete
-          find . -type d ! -name '.' ! -name '..' -exec rm -r {} +
-
+          
           # Clone repository
           git clone https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git .
 
@@ -47,18 +46,12 @@ jobs:
           openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout key.pem -out cert.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
           openssl req -new -key key.pem -out csr.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
           echo "CSR, Cert, and Key files created."
-
+          
           # Install dependencies
           npm install
 
-          # Build frontend
-          cd client
-          npm install
-          npm run build
-          cd ..
-
           # Install pm2
-          npm install pm2 -g
+          sudo npm install pm2 -g
 
           # Start the backend server with pm2
           pm2 start app.js --name backend-server
@@ -69,7 +62,7 @@ jobs:
 
     - name: Copy frontend build files to the server
       run: |
-        scp -r -o StrictHostKeyChecking=no ${{ secrets.NAME }}@${{ secrets.HOST_IP }}:~/repo/client/build/* /var/www/html/
+        scp -r -o StrictHostKeyChecking=no client/build/* ${{ secrets.NAME }}@${{ secrets.HOST_IP }}:/var/www/html/
 
     - name: Copy all files to the server root
       run: |
