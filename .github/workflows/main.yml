@@ -18,6 +18,14 @@ jobs:
       with:
         node-version: 18
 
+    - name: Install dependencies and build frontend
+      working-directory: ./client
+      run: |
+        npm install
+        npm run build
+      env:
+        CI: false
+
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v0.3.0
       with:
@@ -30,15 +38,19 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
-    - name: Deploy frontend and backend
+    - name: SSH into server and deploy
+      env:
+        HOST_IP: ${{ secrets.HOST_IP }}
+        NAME: ${{ secrets.NAME }}
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.NAME }}@${{ secrets.HOST_IP }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
           cd ~/repo
           echo "Loading environment variables from .env file"
+          set -o allexport
           source .env
-          export $(cat .env | xargs)
+          set +o allexport
+          echo "Environment variables:"
+          printenv
           npm install
           npm run setup-start
         EOF
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
