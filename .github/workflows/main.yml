@@ -28,3 +28,17 @@ jobs:
           echo "SSH connection successful!"
           ls -la ~
         EOF
+
+    - name: SSH into server and create .pem files
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+        HOST_IP: ${{ secrets.HOST_IP }}
+        NAME: ${{ secrets.NAME }}
+      run: |
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+          cd ~/repo
+          openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout key.pem -out cert.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
+          openssl req -new -key key.pem -out csr.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
+          echo "CSR, Cert, and Key files created."
+          ls -la
+        EOF
