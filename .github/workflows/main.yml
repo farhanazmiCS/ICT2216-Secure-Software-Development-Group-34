@@ -18,32 +18,22 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
-    - name: SSH into server, create/check repo directory, and clear the repo directory except for .env file
+    - name: SSH into server, clone repository, and copy .env file
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
         NAME: ${{ secrets.NAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
-        ssh -o StrictHostKeyChecking=no -t $NAME@$HOST_IP << 'EOF'
-          # Check if repo directory exists, if not create it, else cd into it
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
           cd ~
           if [ ! -d repo ]; then
             mkdir -p repo
-            cd repo
-            git init
-            git remote add origin https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git
-          else
-            cd repo
           fi
-
-          # Remove all files except .env
-          find . -type f ! -name '.env' -delete
-          find . -type d ! -name '.' -delete
-
-          # Fetch the latest code from the repository
-          git fetch origin
-          git reset --hard origin/main
+          cd repo
+          rm -rf ./*
+          git clone https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git .
+          mv ../.env .
         EOF
 
     - name: SSH into server to create key.pem, cert.pem, and csr.pem certificates
@@ -52,9 +42,8 @@ jobs:
         HOST_IP: ${{ secrets.HOST_IP }}
         NAME: ${{ secrets.NAME }}
       run: |
-        ssh -o StrictHostKeyChecking=no -t $NAME@$HOST_IP << 'EOF'
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
           cd ~/repo
-          # Create key.pem, cert.pem, and csr.pem certificates
           openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout key.pem -out cert.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
           openssl req -new -key key.pem -out csr.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
           echo "CSR, Cert, and Key files created."
@@ -67,10 +56,8 @@ jobs:
         HOST_IP: ${{ secrets.HOST_IP }}
         NAME: ${{ secrets.NAME }}
       run: |
-        ssh -o StrictHostKeyChecking=no -t $NAME@$HOST_IP << 'EOF'
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
           cd ~/repo
-          chmod -R 755 node_modules
-          chmod +x node_modules/.bin/cross-env
           npm install
           npm run setup-start
         EOF
@@ -85,7 +72,7 @@ jobs:
 
     - name: SSH into server and restart services
       run: |
-        ssh -o StrictHostKeyChecking=no -t ${{ secrets.NAME }}@${{ secrets.HOST_IP }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no ${{ secrets.NAME }}@${{ secrets.HOST_IP }} << 'EOF'
           cd ~
           sudo cp -r repo/client/build/* /var/www/html/
           sudo systemctl restart nginx
