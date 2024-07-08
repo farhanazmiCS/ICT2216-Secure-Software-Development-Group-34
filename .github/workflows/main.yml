@@ -18,7 +18,7 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
-    - name: SSH into server and set up
+    - name: SSH into server, create/check repo directory, and clear the repo directory except for .env file
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
@@ -35,38 +35,63 @@ jobs:
 
           # Remove all files except .env
           find . -type f ! -name '.env' -delete
-          
-          # Clone repository
-          git clone https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git .
+        EOF
 
-          # Copy .env file to repo directory
-          cp ../.env .
-
+    - name: SSH into server to create key.pem, cert.pem, and csr.pem certificates
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+        HOST_IP: ${{ secrets.HOST_IP }}
+        NAME: ${{ secrets.NAME }}
+      run: |
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+          cd ~/repo
           # Create key.pem, cert.pem, and csr.pem certificates
           openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout key.pem -out cert.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
           openssl req -new -key key.pem -out csr.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
           echo "CSR, Cert, and Key files created."
-          
-          # Install dependencies
+          ls -la
+        EOF
+
+    - name: SSH into server to clone repository
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+        HOST_IP: ${{ secrets.HOST_IP }}
+        NAME: ${{ secrets.NAME }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+          cd ~/repo
+          git clone https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git .
+        EOF
+
+    - name: SSH into server to build backend
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+        HOST_IP: ${{ secrets.HOST_IP }}
+        NAME: ${{ secrets.NAME }}
+      run: |
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+          cd ~/repo
           npm install
-
-          # Install pm2
           npm install pm2 -g
-
-          # Start the backend server with pm2
           pm2 start app.js --name backend-server
+        EOF
 
-          # Exit the SSH session
-          exit
+    - name: SSH into server to build frontend
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+        HOST_IP: ${{ secrets.HOST_IP }}
+        NAME: ${{ secrets.NAME }}
+      run: |
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+          cd ~/repo/client
+          npm install
+          npm run build
         EOF
 
     - name: Copy frontend build files to the server
       run: |
-        scp -r -o StrictHostKeyChecking=no client/build/* ${{ secrets.NAME }}@${{ secrets.HOST_IP }}:/var/www/html/
-
-    - name: Copy all files to the server root
-      run: |
-        scp -r -o StrictHostKeyChecking=no * ${{ secrets.NAME }}@${{ secrets.HOST_IP }}:~/
+        scp -r -o StrictHostKeyChecking=no ~/repo/client/build/* ${{ secrets.NAME }}@${{ secrets.HOST_IP }}:/var/www/html/
 
     - name: SSH into server and restart services
       run: |
