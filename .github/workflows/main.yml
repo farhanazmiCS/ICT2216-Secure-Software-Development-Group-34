@@ -24,8 +24,35 @@ jobs:
         HOST_IP: ${{ secrets.HOST_IP }}
         NAME: ${{ secrets.NAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        MONGO_URL: ${{ secrets.MONGO_URL }}
+        MONGO_URI: ${{ secrets.MONGO_URI }}
+        BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        JWT_LIFETIME: ${{ secrets.JWT_LIFETIME }}
+        NODE_ENV: ${{ secrets.NODE_ENV }}
+        EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+        EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+        EMAIL_SECURE: ${{ secrets.EMAIL_SECURE }}
+        EMAIL_USER: ${{ secrets.EMAIL_USER }}
+        EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+        EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
       run: |
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+          # Set environment variables
+          echo "MONGO_URL=${MONGO_URL}" >> ~/.bashrc
+          echo "MONGO_URI=${MONGO_URI}" >> ~/.bashrc
+          echo "BACKEND_PORT=${BACKEND_PORT}" >> ~/.bashrc
+          echo "JWT_SECRET=${JWT_SECRET}" >> ~/.bashrc
+          echo "JWT_LIFETIME=${JWT_LIFETIME}" >> ~/.bashrc
+          echo "NODE_ENV=${NODE_ENV}" >> ~/.bashrc
+          echo "EMAIL_HOST=${EMAIL_HOST}" >> ~/.bashrc
+          echo "EMAIL_PORT=${EMAIL_PORT}" >> ~/.bashrc
+          echo "EMAIL_SECURE=${EMAIL_SECURE}" >> ~/.bashrc
+          echo "EMAIL_USER=${EMAIL_USER}" >> ~/.bashrc
+          echo "EMAIL_PASS=${EMAIL_PASS}" >> ~/.bashrc
+          echo "EMAIL_FROM=${EMAIL_FROM}" >> ~/.bashrc
+          source ~/.bashrc
+
           # Install Node.js 14.x
           curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
           sudo apt-get install -y nodejs
