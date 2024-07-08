@@ -76,13 +76,7 @@ app.use(
   })
 );
 
-// Static file serving for production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.resolve(__dirname, './client/build')));
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, './client/build', 'index.html'));
-  });
-}
+
 
 app.use(fileUpload());
 
@@ -92,8 +86,20 @@ app.use('/api/v1/pets', petRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/orders', orderRouter);
 
+
+// Static file serving for production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.resolve(__dirname, './client/build')));
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, './client/build', 'index.html'));
+  });
+}
+
+
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
+
+
 
 // HTTPS Part of the code
 

@@ -45,7 +45,6 @@ export const PetsProvider = ({ children }) => {
     try {
       const response = await axios.get(url);
       const pets = response.data.pets;
-      console.log(pets);
       // const pets = petsData;
       dispatch({ type: GET_PETS_SUCCESS, payload: pets });
     } catch (error) {

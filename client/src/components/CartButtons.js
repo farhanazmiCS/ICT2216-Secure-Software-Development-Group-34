@@ -9,7 +9,7 @@ import { useAppContext } from '../context/appContext'
 const CartButton = () => {
   const { closeSidebar } = usePetsContext()
   const { total_items, clearCart } = useCartContext()
-  const { user, logoutUser } = useAppContext(); // Use user to determine if user is logged in or not
+  const { user, logout } = useAppContext(); // Use user to determine if user is logged in or not
 
   return (
     <Wrapper className='cart-btn-wrapper'>
@@ -28,7 +28,7 @@ const CartButton = () => {
             onClick={() => {
               clearCart();
               localStorage.removeItem('user');
-              logoutUser();
+              logout();
             }}
           >
             {`Welcome, ${user.name || user.nickname}`} <FaUserMinus />
