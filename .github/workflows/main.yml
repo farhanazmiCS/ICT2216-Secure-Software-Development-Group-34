@@ -61,7 +61,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
           cd ~/repo
-          git clone https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git .
+          git clone https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git
         EOF
 
     - name: SSH into server to build frontend and backend
