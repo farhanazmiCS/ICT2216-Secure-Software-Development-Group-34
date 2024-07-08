@@ -9,6 +9,9 @@ import PrivateRoute from './PrivateRoute'
 import AuthWrapper from './AuthWrapper'
 import Login from './Login'
 import Logout from './Logout'
+import UserHome from './UserHome'
+import Roles from './Roles'
+import ProcessAdoption from './ProcessAdoption'
 export {
   Home,
   SinglePet,
@@ -20,5 +23,8 @@ export {
   PrivateRoute,
   AuthWrapper,
   Login,
-  Logout
+  Logout,
+  UserHome,
+  Roles,
+  ProcessAdoption
 }
