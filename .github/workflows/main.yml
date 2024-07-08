@@ -27,7 +27,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.NAME }}@${{ secrets.HOST_IP }} << 'EOF'
           cd ~
-          git clone https://github.com/your-repo-url.git repo
+          git clone https://github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git repo
           cd repo
           npm install
           npm run setup-start
