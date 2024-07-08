@@ -23,6 +23,7 @@ jobs:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
         NAME: ${{ secrets.NAME }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
           # Check if repo directory exists, if not create it, else cd into it
@@ -34,6 +35,11 @@ jobs:
 
           # Remove all files except .env
           find . -type f ! -name '.env' -delete
+
+          # Pull the latest changes from the repository
+          git init
+          git remote add origin https://$GH_TOKEN@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git
+          git pull origin main
         EOF
 
     - name: SSH into server to create key.pem, cert.pem, and csr.pem certificates
@@ -51,24 +57,7 @@ jobs:
           ls -la
         EOF
 
-    - name: SSH into server to pull repository and create .env file
-      env:
-        SSH_KEY: ${{ secrets.SSH_KEY }}
-        HOST_IP: ${{ secrets.HOST_IP }}
-        NAME: ${{ secrets.NAME }}
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |
-        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
-          cd ~/repo
-          git init
-          git remote add origin https://github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git
-          git pull origin main
-
-          # Verify environment variables
-          cat .env
-        EOF
-
-    - name: SSH into server to run build commands
+    - name: SSH into server to run npm run setup-start
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
@@ -76,8 +65,6 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
           cd ~/repo
-          sudo chmod -R 755 node_modules
-          sudo chmod +x node_modules/.bin/cross-env
           npm install
           npm run setup-start
         EOF
