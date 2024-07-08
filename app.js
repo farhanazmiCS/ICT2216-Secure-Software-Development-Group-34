@@ -66,7 +66,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URI,
+      mongoUrl: process.env.MONGO_URL,
       ttl: 14 * 24 * 60 * 60 // = 14 days. Default
     }),
     cookie: {
