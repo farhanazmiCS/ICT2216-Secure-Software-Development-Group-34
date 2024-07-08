@@ -28,7 +28,6 @@ const connectDB = require('./db/connect');
 const authRouter = require('./routes/authRoutes');
 const userRouter = require('./routes/userRoutes');
 const petRouter = require('./routes/petRoutes');
-const petRouter = require('./routes/petRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const orderRouter = require('./routes/orderRoutes');
 
@@ -71,7 +70,7 @@ app.use(
       ttl: 14 * 24 * 60 * 60 // = 14 days. Default
     }),
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === 'production', // Secure cookie in production
       maxAge: 1000 * 60 * 60,
     },
   })
@@ -96,8 +95,7 @@ app.use('/api/v1/orders', orderRouter);
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
-
-//HTTPS Part of the code
+// HTTPS Part of the code
 
 const port = process.env.PORT || 5000;
 const start = async () => {
