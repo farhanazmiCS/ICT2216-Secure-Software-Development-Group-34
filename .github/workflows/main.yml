@@ -1,4 +1,4 @@
-name: Deploy Frontend
+name: Deploy Frontend and Backend
 
 on:
   push:
@@ -13,19 +13,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: 18
-
-    - name: Install dependencies and build frontend
-      working-directory: ./client
-      run: |
-        npm install
-        npm run build
-      env:
-        CI: false
-
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v0.3.0
       with:
@@ -38,7 +25,15 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
-    - name: Deploy frontend
+    - name: Copy repository to GCP instance
       run: |
-        gcloud compute ssh ${{ secrets.GCP_INSTANCE_NAME }} --zone ${{ secrets.GCP_ZONE }} --command "sudo rm -rf /var/www/html/*"
-        gcloud compute scp --recurse client/build/* ${{ secrets.GCP_INSTANCE_NAME }}:/var/www/html/ --zone ${{ secrets.GCP_ZONE }}
+        gcloud compute scp --recurse . ${{ secrets.GCP_INSTANCE_NAME }}:/home/deploy/repo --zone ${{ secrets.GCP_ZONE }}
+
+    - name: Build and deploy on GCP instance
+      run: |
+        gcloud compute ssh ${{ secrets.GCP_INSTANCE_NAME }} --zone ${{ secrets.GCP_ZONE }} --command "
+          cd /home/deploy/repo &&
+          npm run setup-start &&
+          sudo rm -rf /var/www/html/* &&
+          sudo cp -r client/build/* /var/www/html/
+        "
