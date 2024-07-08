@@ -23,17 +23,27 @@ jobs:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
         NAME: ${{ secrets.NAME }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         ssh -o StrictHostKeyChecking=no -t $NAME@$HOST_IP << 'EOF'
           # Check if repo directory exists, if not create it, else cd into it
           cd ~
           if [ ! -d repo ]; then
             mkdir -p repo
+            cd repo
+            git init
+            git remote add origin https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git
+          else
+            cd repo
           fi
-          cd repo
 
           # Remove all files except .env
           find . -type f ! -name '.env' -delete
+          find . -type d ! -name '.' -delete
+
+          # Fetch the latest code from the repository
+          git fetch origin
+          git reset --hard origin/main
         EOF
 
     - name: SSH into server to create key.pem, cert.pem, and csr.pem certificates
@@ -51,24 +61,7 @@ jobs:
           ls -la
         EOF
 
-    - name: SSH into server to pull repository
-      env:
-        SSH_KEY: ${{ secrets.SSH_KEY }}
-        HOST_IP: ${{ secrets.HOST_IP }}
-        NAME: ${{ secrets.NAME }}
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |
-        ssh -o StrictHostKeyChecking=no -t $NAME@$HOST_IP << 'EOF'
-          cd ~/repo
-          git init
-          git remote add origin https://$GH_TOKEN@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git
-          git pull origin main
-
-          # Verify environment variables
-          cat .env
-        EOF
-
-    - name: SSH into server to run build commands
+    - name: SSH into server to build frontend and backend
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
@@ -80,4 +73,20 @@ jobs:
           chmod +x node_modules/.bin/cross-env
           npm install
           npm run setup-start
+        EOF
+
+    - name: Copy frontend build files to the server
+      run: |
+        scp -r -o StrictHostKeyChecking=no client/build/* ${{ secrets.NAME }}@${{ secrets.HOST_IP }}:/var/www/html/
+
+    - name: Copy all files to the server root
+      run: |
+        scp -r -o StrictHostKeyChecking=no * ${{ secrets.NAME }}@${{ secrets.HOST_IP }}:~/
+
+    - name: SSH into server and restart services
+      run: |
+        ssh -o StrictHostKeyChecking=no -t ${{ secrets.NAME }}@${{ secrets.HOST_IP }} << 'EOF'
+          cd ~
+          sudo cp -r repo/client/build/* /var/www/html/
+          sudo systemctl restart nginx
         EOF
