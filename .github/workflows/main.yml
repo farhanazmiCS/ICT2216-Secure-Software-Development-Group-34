@@ -1,4 +1,4 @@
-name: Deploy Frontend & Backend
+name: Deploy Frontend and Backend (Group 34)
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
-    - name: SSH into server, create/check repo directory, and clear the repo directory except for .env file
+    - name: SSH into server, clone repository, and copy .env file
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
@@ -26,38 +26,40 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
-          # Check if repo directory exists, if not create it, else cd into it
           cd ~
           if [ ! -d repo ]; then
             mkdir -p repo
           fi
           cd repo
-
-          # Remove all files except .env
-          find . -type f ! -name '.env' -delete
-          
-          # Clone repository
+          rm -rf ./*
           git clone https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git .
+          mv ../.env .
+        EOF
 
-          # Copy .env file to repo directory
-          cp ../.env .
-
-          # Create key.pem, cert.pem, and csr.pem certificates
+    - name: SSH into server to create key.pem, cert.pem, and csr.pem certificates
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+        HOST_IP: ${{ secrets.HOST_IP }}
+        NAME: ${{ secrets.NAME }}
+      run: |
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+          cd ~/repo
           openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout key.pem -out cert.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
           openssl req -new -key key.pem -out csr.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
           echo "CSR, Cert, and Key files created."
-          
-          # Install dependencies
+          ls -la
+        EOF
+
+    - name: SSH into server to build frontend and backend
+      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
+        HOST_IP: ${{ secrets.HOST_IP }}
+        NAME: ${{ secrets.NAME }}
+      run: |
+        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+          cd ~/repo
           npm install
-
-          # Install pm2
-          sudo npm install pm2 -g
-
-          # Start the backend server with pm2
-          pm2 start app.js --name backend-server
-
-          # Exit the SSH session
-          exit
+          npm run setup-start
         EOF
 
     - name: Copy frontend build files to the server
