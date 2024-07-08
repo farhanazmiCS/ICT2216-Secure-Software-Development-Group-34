@@ -17,7 +17,7 @@ const AddToCart = ({ pet }) => {
           className='btn'
           onClick={() => addToCart(id, pet)}
         >
-          add to cart
+          adoption
         </Link>
       </div>
     </Wrapper>
