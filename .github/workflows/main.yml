@@ -37,4 +37,7 @@ jobs:
 
           # Create key.pem, cert.pem, and csr.pem certificates
           openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -keyout key.pem -out cert.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
-          openssl req -new -key key.pem -out csr.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=​⬤
+          openssl req -new -key key.pem -out csr.pem -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=common.name"
+          echo "CSR, Cert, and Key files created."
+          ls -la
+        EOF
