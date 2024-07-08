@@ -18,87 +18,25 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
-    - name: Create repo directory on server
+    - name: SSH into server and build
       env:
-        HOST_IP: ${{ secrets.HOST_IP }}
-        NAME: ${{ secrets.NAME }}
-      run: |
-        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
-          rm -rf ~/repo
-          mkdir -p ~/repo
-        EOF
-
-    - name: Clone repository on server
-      env:
+        SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
         NAME: ${{ secrets.NAME }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
-          cd ~/repo
-          git clone https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git .
-        EOF
-
-    - name: Create .env file on server
-      env:
-        HOST_IP: ${{ secrets.HOST_IP }}
-        NAME: ${{ secrets.NAME }}
-        MONGO_URL: ${{ secrets.MONGO_URL }}
-        MONGO_URI: ${{ secrets.MONGO_URI }}
-        PORT: ${{ secrets.BACKEND_PORT }}
-        JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        JWT_LIFETIME: ${{ secrets.JWT_LIFETIME }}
-        NODE_ENV: ${{ secrets.NODE_ENV }}
-        EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
-        EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
-        EMAIL_SECURE: ${{ secrets.EMAIL_SECURE }}
-        EMAIL_USER: ${{ secrets.EMAIL_USER }}
-        EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-        EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
-      run: |
-        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
-          cd ~/repo
-          echo "MONGO_URL=${MONGO_URL}" >> .env
-          echo "MONGO_URI=${MONGO_URI}" >> .env
-          echo "PORT=${PORT}" >> .env
-          echo "JWT_SECRET=${JWT_SECRET}" >> .env
-          echo "JWT_LIFETIME=${JWT_LIFETIME}" >> .env
-          echo "NODE_ENV=${NODE_ENV}" >> .env
-          echo "EMAIL_HOST=${EMAIL_HOST}" >> .env
-          echo "EMAIL_PORT=${EMAIL_PORT}" >> .env
-          echo "EMAIL_SECURE=${EMAIL_SECURE}" >> .env
-          echo "EMAIL_USER=${EMAIL_USER}" >> .env
-          echo "EMAIL_PASS=${EMAIL_PASS}" >> .env
-          echo "EMAIL_FROM=${EMAIL_FROM}" >> .env
-        EOF
-
-    - name: Verify environment variables on server
-      env:
-        HOST_IP: ${{ secrets.HOST_IP }}
-        NAME: ${{ secrets.NAME }}
-      run: |
-        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
-          cd ~/repo
-          cat .env
-        EOF
-
-    - name: Install Node.js 14.x on server
-      env:
-        HOST_IP: ${{ secrets.HOST_IP }}
-        NAME: ${{ secrets.NAME }}
-      run: |
-        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
+          # Install Node.js 14.x
           curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
           sudo apt-get install -y nodejs
-        EOF
 
-    - name: Build and run the project on server
-      env:
-        HOST_IP: ${{ secrets.HOST_IP }}
-        NAME: ${{ secrets.NAME }}
-      run: |
-        ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
-          cd ~/repo
+          # Clone repository and run build commands
+          cd ~
+          if [ -d repo ]; then
+            rm -rf repo
+          fi
+          git clone https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git repo
+          cd repo
           npm install
           npm run setup-start
         EOF
