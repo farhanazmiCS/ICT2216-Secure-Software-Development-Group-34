@@ -38,7 +38,7 @@ jobs:
 
           # Pull the latest changes from the repository
           git init
-          git remote add origin https://$GH_TOKEN@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git
+          git remote add origin https://github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git
           git pull origin main
         EOF
 
