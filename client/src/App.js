@@ -14,6 +14,9 @@ import {
   AuthWrapper,
   Login,
   Logout,
+  UserHome,
+  Roles,
+  ProcessAdoption,
 } from './pages';
 function App() {
   return (
@@ -30,7 +33,10 @@ function App() {
           <Route path='pets' element={<Pets />} />
           <Route path='pets/:id' element={<SinglePet />} />
           <Route path='login' element={<Login />} />
-          <Route path='logout' element={<Logout/>} />  
+          <Route path='logout' element={<Logout/>} /> 
+          <Route path='userhome' element={<UserHome />} />
+          <Route path='roles' element={<Roles />} /> 
+          <Route path='adoption' element={<ProcessAdoption />} />  
           <Route
             path='checkout'
             element={
