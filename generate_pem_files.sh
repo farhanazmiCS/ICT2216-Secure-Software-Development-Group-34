@@ -1,5 +1,8 @@
 #!/bin/bash
 
+PORT=44818
+fuser -k ${PORT}/tcp
+
 # Ensure the certs directory exists
 mkdir -p certs
 
