@@ -1,4 +1,4 @@
-name: Deploy Frontend and Backend
+name: Deploy Frontend
 
 on:
   push:
@@ -13,6 +13,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 18
+
+    - name: Install dependencies and build frontend
+      working-directory: ./client
+      run: |
+        npm install
+        npm run build
+      env:
+        CI: false
+
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v0.3.0
       with:
@@ -20,21 +33,21 @@ jobs:
         service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
         export_default_credentials: true
 
+    - name: Generate SSH Key (if not already generated)
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub
+        echo "Host *" >> ~/.ssh/config
+        echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+
     - name: Add SSH key to the agent
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
-    - name: Copy repository to GCP instance
+    - name: Deploy frontend
       run: |
-        gcloud compute scp --recurse . ${{ secrets.GCP_INSTANCE_NAME }}:/home/deploy/repo --zone ${{ secrets.GCP_ZONE }}
-
-    - name: Build and deploy on GCP instance
-      run: |
-        gcloud compute ssh ${{ secrets.GCP_INSTANCE_NAME }} --zone ${{ secrets.GCP_ZONE }} --command "
-          cd /home/deploy/repo &&
-          npm install &&
-          npm run setup-start &&
-          sudo rm -rf /var/www/html/* &&
-          sudo cp -r client/build/* /var/www/html/
-        "
+        gcloud compute ssh ${{ secrets.GCP_INSTANCE_NAME }} --zone ${{ secrets.GCP_ZONE }} --command "sudo rm -rf /var/www/html/*"
+        gcloud compute scp --recurse client/build/* ${{ secrets.GCP_INSTANCE_NAME }}:/var/www/html/ --zone ${{ secrets.GCP_ZONE }}
