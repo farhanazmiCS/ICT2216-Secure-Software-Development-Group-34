@@ -5,39 +5,44 @@ import styled from 'styled-components'
 import { usePetsContext } from '../context/pets_context'
 import { useCartContext } from '../context/cart_context'
 import { useAppContext } from '../context/appContext'
+
 const CartButton = () => {
   const { closeSidebar } = usePetsContext()
   const { total_items, clearCart } = useCartContext()
-  const { user, logout } = useAppContext()
+  const { user, logoutUser } = useAppContext(); // Use user to determine if user is logged in or not
+
   return (
     <Wrapper className='cart-btn-wrapper'>
-      <Link to='/cart' className='cart-btn' onClick={closeSidebar}>
-        Cart
-        <span className='cart-container'>
-          <FaShoppingCart />
-          <span className='cart-value'>{total_items}</span>
-        </span>
-      </Link>
-      {user ? (
-        <button
-          type='button'
-          className='auth-btn'
-          onClick={() => {
-            clearCart()
-            localStorage.removeItem('user')
-            logout({ returnTo: window.location.origin })
-          }}
-        >
-          Logout <FaUserMinus />
-        </button>
+      {user ? ( // If user is logged in then provide a welcome user feedback
+        <>
+          <Link to='/cart' className='cart-btn' onClick={closeSidebar}>
+            Cart
+            <span className='cart-container'>
+              <FaShoppingCart />
+              <span className='cart-value'>{total_items}</span>
+            </span>
+          </Link>
+          <Link
+            to='/'
+            className='auth-btn'
+            onClick={() => {
+              clearCart();
+              localStorage.removeItem('user');
+              logoutUser();
+            }}
+          >
+            {`Welcome, ${user.name || user.nickname}`} <FaUserMinus />
+          </Link>
+        </>
       ) : (
+        // Otherwise bring them to the login page
         <Link type='button' className='auth-btn' to='/login'>
           Login <FaUserPlus />
         </Link>
       )}
     </Wrapper>
-  )
-}
+  );
+};
 
 const Wrapper = styled.div`
   display: grid;
