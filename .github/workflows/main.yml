@@ -13,87 +13,48 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up SSH
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 18
+
+    - name: Install dependencies and build frontend
+      working-directory: ./client
+      run: |
+        npm install
+        npm run build
+      env:
+        CI: false
+
+    - name: Install dependencies and build backend
+      run: |
+        npm install
+        npm install connect-mongo
+        npm start
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0.3.0
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCLOUD_SERVICE_KEY }}
+        export_default_credentials: true
+
+    - name: Add SSH key to the agent
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
-    - name: SSH into server and build
+    - name: SSH into server and read .env file
       env:
         SSH_KEY: ${{ secrets.SSH_KEY }}
         HOST_IP: ${{ secrets.HOST_IP }}
         NAME: ${{ secrets.NAME }}
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        MONGO_URL: ${{ secrets.MONGO_URL }}
-        MONGO_URI: ${{ secrets.MONGO_URI }}
-        PORT: ${{ secrets.BACKEND_PORT }}
-        JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        JWT_LIFETIME: ${{ secrets.JWT_LIFETIME }}
-        NODE_ENV: ${{ secrets.NODE_ENV }}
-        EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
-        EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
-        EMAIL_SECURE: ${{ secrets.EMAIL_SECURE }}
-        EMAIL_USER: ${{ secrets.EMAIL_USER }}
-        EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-        EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
       run: |
         ssh -o StrictHostKeyChecking=no $NAME@$HOST_IP << 'EOF'
-          # Set environment variables
-          echo "export MONGO_URL=${MONGO_URL}" >> ~/.bashrc
-          echo "export MONGO_URI=${MONGO_URI}" >> ~/.bashrc
-          echo "export BACKEND_PORT=${BACKEND_PORT}" >> ~/.bashrc
-          echo "export JWT_SECRET=${JWT_SECRET}" >> ~/.bashrc
-          echo "export JWT_LIFETIME=${JWT_LIFETIME}" >> ~/.bashrc
-          echo "export NODE_ENV=${NODE_ENV}" >> ~/.bashrc
-          echo "export EMAIL_HOST=${EMAIL_HOST}" >> ~/.bashrc
-          echo "export EMAIL_PORT=${EMAIL_PORT}" >> ~/.bashrc
-          echo "export EMAIL_SECURE=${EMAIL_SECURE}" >> ~/.bashrc
-          echo "export EMAIL_USER=${EMAIL_USER}" >> ~/.bashrc
-          echo "export EMAIL_PASS=${EMAIL_PASS}" >> ~/.bashrc
-          echo "export EMAIL_FROM=${EMAIL_FROM}" >> ~/.bashrc
-          source ~/.bashrc
-
-          # Verify environment variables
-          echo "MONGO_URL: $MONGO_URL"
-          echo "MONGO_URI: $MONGO_URI"
-          echo "BACKEND_PORT: $BACKEND_PORT"
-          echo "JWT_SECRET: $JWT_SECRET"
-          echo "JWT_LIFETIME: $JWT_LIFETIME"
-          echo "NODE_ENV: $NODE_ENV"
-          echo "EMAIL_HOST: $EMAIL_HOST"
-          echo "EMAIL_PORT: $EMAIL_PORT"
-          echo "EMAIL_SECURE: $EMAIL_SECURE"
-          echo "EMAIL_USER: $EMAIL_USER"
-          echo "EMAIL_PASS: $EMAIL_PASS"
-          echo "EMAIL_FROM: $EMAIL_FROM"
-
-          # Install Node.js 14.x
-          curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-          sudo apt-get install -y nodejs
-
-          # Clone repository and run build commands
-          cd ~
-          if [ -d repo ]; then
-            rm -rf repo
-          fi
-          git clone https://${{ secrets.GH_TOKEN }}@github.com/farhanazmiCS/ICT2216-Secure-Software-Development-Group-34.git repo
-          cd repo
+          cd ~/repo
+          set -a
+          source .env
+          set +a
           npm install
           npm run setup-start
-        EOF
-
-    - name: Copy frontend build files to the server
-      run: |
-        scp -r -o StrictHostKeyChecking=no client/build/* ${{ secrets.NAME }}@${{ secrets.HOST_IP }}:/var/www/html/
-
-    - name: Copy all files to the server root
-      run: |
-        scp -r -o StrictHostKeyChecking=no * ${{ secrets.NAME }}@${{ secrets.HOST_IP }}:~/
-
-    - name: SSH into server and restart services
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.NAME }}@${{ secrets.HOST_IP }} << 'EOF'
-          cd ~
-          sudo cp -r repo/client/build/* /var/www/html/
-          sudo systemctl restart nginx
         EOF
