@@ -2,11 +2,19 @@ import React from 'react';
 import styled from 'styled-components';
 import { useCartContext } from '../context/cart_context';
 import { useAppContext } from '../context/appContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const CartTotals = () => {
-  const { total_items } = useCartContext();
+  const { total_items, addAdoptionRequest, cart } = useCartContext();
   const { user } = useAppContext();
+  const navigate = useNavigate();
+
+  const handleRequestAdoption = () => {
+    cart.forEach(pet => {
+      addAdoptionRequest(pet);
+    });
+    navigate('/');
+  };
 
   return (
     <Wrapper>
@@ -16,13 +24,13 @@ const CartTotals = () => {
             total items :<span>{total_items}</span>
           </h5>
         </article>
-        {user ? (
-          <Link to='/checkout' className='btn'>
-            proceed to checkout
-          </Link>
+        {user.role === 'staff' ? (
+          <button className='btn'>
+            request for adoption
+          </button>
         ) : (
-          <Link to='/login' className='btn'>
-            login
+          <Link to='/' className='btn'  onClick={handleRequestAdoption}>
+            request for adoption
           </Link>
         )}
       </div>
