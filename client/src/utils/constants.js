@@ -65,9 +65,9 @@ export const services = [
   },
 ];
 
-export const pets_url = '/api/v1/pets/';
+export const pets_url = 'https://ict2216-secure-software-development.onrender.com/api/v1/pets/';
 
-export const single_pet_url = `/api/v1/pets/`;
+export const single_pet_url = `https://ict2216-secure-software-development.onrender.com/api/v1/pets/`;
 
 // export const pets_url = '/utils/pets.json'
 // export const single_pet_url = '/utils/pets_detail.json?id='
