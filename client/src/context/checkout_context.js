@@ -22,7 +22,7 @@ export const CheckoutProvider = ({ children }) => {
   const submitRequest = async (formData) => {
     dispatch({ type: SUBMIT_REQUEST_BEGIN });
     try {
-      await axios.post('/api/request', formData);
+      await axios.post('https://ict2216-secure-software-development.onrender.com/api/request', formData);
       dispatch({ type: SUBMIT_REQUEST_SUCCESS });
     } catch (error) {
       dispatch({

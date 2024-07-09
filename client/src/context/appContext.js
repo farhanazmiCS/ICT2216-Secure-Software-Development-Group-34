@@ -82,7 +82,7 @@ const AppProvider = ({ children }) => {
 
   // axios
   const authFetch = axios.create({
-    baseURL: '/api/v1',
+    baseURL: 'https://ict2216-secure-software-development.onrender.com/api/v1',
   });
   // request
   authFetch.interceptors.request.use(
@@ -134,7 +134,7 @@ const AppProvider = ({ children }) => {
     dispatch({ type: SETUP_USER_BEGIN });
     try {
       const { data } = await axios.post(
-        `/api/v1/auth/${endPoint}`,
+        `https://ict2216-secure-software-development.onrender.com/api/v1/auth/${endPoint}`,
         currentUser,
         {
           headers: {
