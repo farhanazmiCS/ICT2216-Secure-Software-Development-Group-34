@@ -1,7 +1,7 @@
 {
   "name": "comfy",
   "version": "0.1.0",
-  "homepage": "https://animalsms.github.io/ICT2216-Secure-Software-Development-Group-34",
+  "homepage": "https://animalsms.github.io/",
   "private": true,
   "dependencies": {
     "@auth0/auth0-react": "^2.0.0",
